@@ -17,7 +17,7 @@ const alnumSchema = new mongoose.Schema({
         type: Strind,
         requires: true,
     },
-    song:[
+    songs:[
         {
             type : mongoose.Schema.Types.ObjectId,
             ref : "song"
