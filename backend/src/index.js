@@ -12,6 +12,7 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 4561
 
+app.use(express.json())
 
 app.use("/api/user", userRoutes);
 app.use("/api/auth", authRoutes);
