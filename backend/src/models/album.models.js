@@ -14,7 +14,7 @@ const alnumSchema = new mongoose.Schema({
         require : true,
     },
     releaseYear :{
-        type: Strind,
+        type: String,
         requires: true,
     },
     songs:[

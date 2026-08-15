@@ -15,7 +15,7 @@ const uploadToCloudinary = async (file) =>{
     }
 }
 
-export const createSong = (req,res, next) => {
+export const createSong = async (req,res, next) => {
    try {
     if (!req.files || !req.files.audioFile || !req.file.imageFile){
         return res.status(400).json({
@@ -48,4 +48,62 @@ export const createSong = (req,res, next) => {
     res.status(500).json({message: "internal server error create song", error})
     next(error)
    }
+}
+
+export const deleteSong = async (req,res, next) => {
+    try {
+        const { id } = req.params
+
+        const song = await Song.findById(id)
+
+        // if  song from album
+        if(song.albymId){
+            await Album.findByIdAndUpdate(song.albumId, {
+                $pull : { songs : song._id},
+            })
+        }
+        await Song.findByIdAndDelete(id)
+        res.status(200).json({message : "Song deleted successfully"})
+    } catch (error) {
+        console.log("errro from deleter song", error);
+        
+        next(error)
+    }
+}
+
+export const createAlbum  = async (req,res, next) => {
+    try {
+        const { title, artist, releaseYear}= req.body 
+        const { imageFile} =req.files
+        const imageUrl = await uploadToCloudinary(imageFile)
+
+        const album = new Album({
+            title,
+             artist,
+             imageUrl,
+             releaseYear
+        })
+
+        await album.save()
+    } catch (error) {
+        console.log("errro from create album", error);
+        next(error)
+    }
+}
+
+export const deleteAlbum = async (req,res, next) => {
+    try {
+        const { id } = req.body
+        await Song.deleteMany({ albumId : id})
+        await Album.findByIdAndDelete(id)
+
+        res.status(200).json({message : "Album deleted successfully"})
+    } catch (error) {
+        console.log("errro from album song", error);
+        next(error);
+    }
+}
+
+export const checkAdmin = async (req,res,next) =>{
+    res.status(200).json({admin:true})
 }

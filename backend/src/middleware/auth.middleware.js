@@ -7,7 +7,7 @@ export const protectRoute = async (req, res, next) =>{
     next();
 }
 
-export const requireAdmin = async (req, resizeBy, next ) => {
+export const requireAdmin = async (req, res, next ) => {
     try {
         const currentUser = await clerkClient.users.getUser(req.auth.userId);
         const isAdmin  = process.env.ADMIN_EMAIL  === currentUser.primaryEmailAddress?.emailAddress
@@ -16,6 +16,7 @@ export const requireAdmin = async (req, resizeBy, next ) => {
             req.status(403).json({messaage : "Unauthorized - you must be an admin"})
         }
     } catch (error) {
-        return res.status(500).json({message : "Internal server error- auth middleware requireAdmin", error})
+        // return res.status(500).json({message : "Internal server error- auth middleware requireAdmin", error})
+        next(error)
     }
 }
