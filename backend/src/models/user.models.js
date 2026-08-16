@@ -3,16 +3,15 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     fullName : {
         type : String,
-        require : true
+        required: true
     },
-    imaheUrl : {
-        type : String,
-        unique : true,
+    imageUrl: {
+        type: String,
     },
     clerkId : {
-        type :String,
-        require : true,
-        unique : true,
+        type: String,
+        required: true,
+        unique: true,
     }
 }, {timestamps: true})
 

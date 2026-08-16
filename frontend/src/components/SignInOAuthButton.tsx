@@ -18,14 +18,14 @@ const SignInOAuthButton = () => {
         redirectUrlComplete :"/auth-callback"
       })
     } catch (error) {
-      
+      console.error("Google sign-in failed:", error);
     }
   }
   return (
     <Button
       variant="secondary"
       onClick={signInWithGoogle}
-      className="w-full text-white border-e-zinc-200 h-11"
+      className="w-full text-white h-11"
     >
       Continue with Google
     </Button>

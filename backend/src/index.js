@@ -10,22 +10,29 @@ import stateRoutes from './routes/state.route.js'
 import { connectDb } from './lib/db.js'
 import fileUpload from 'express-fileupload'
 import path from 'path'
+import cors from "cors"
 
 dotenv.config()
 const app = express()
 const __dirname = path.resolve();
 const PORT = process.env.PORT || 4561
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(express.json())
-app.use(clerkMiddleware)
+app.use(clerkMiddleware())
 
 app.use(fileUpload({
     userTempFiles : true,
     tempFileDir : path.join(__dirname, "tmp"),
     createParentPath : true,
     limits : {
-        fieldSize : 10 * 1024 *1024 // max file size
+        fieldSize : 10 * 1024 * 1024 // max file size
     }
 }))
 app.use("/api/user", userRoutes);
