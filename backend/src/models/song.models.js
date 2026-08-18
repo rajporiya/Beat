@@ -1,31 +1,35 @@
 import mongoose from "mongoose";
 
-const songsSchema = new mongoose.Schema({
-    titel :{
+const songSchema = new mongoose.Schema({
+    title :{
         type :String, 
-        require : true,
+        required : true,
     },
     artist :{
         type :String, 
-        require : true,
+        required : true,
     },
     imageUrl :{
         type :String, 
-        require : true,
+        required : true,
     },
     audioUrl :{
         type :String, 
-        require : true,
+        required : true,
     },
     duration :{
-        type :String, 
-        require : true,
+        type :Number, 
+        required : true,
+    },
+    plays :{
+        type :Number,
+        default : 0,
     },
     albumId :{
         type : mongoose.Schema.Types.ObjectId,
         ref : 'Album',
-        require : false
+        required : false
     }
 }, {timestamps: true})
 
-export const Song = mongoose.model("Song", songsSchema)
+export const Song = mongoose.model("Song", songSchema)

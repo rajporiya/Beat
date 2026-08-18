@@ -1,28 +1,28 @@
 import mongoose from "mongoose";
 
-const alnumSchema = new mongoose.Schema({
-    titel :{
+const albumSchema = new mongoose.Schema({
+    title :{
         type :String, 
-        require : true,
+        required : true,
     },
     artist :{
         type :String, 
-        require : true,
+        required : true,
     },
     imageUrl :{
         type :String, 
-        require : true,
+        required : true,
     },
     releaseYear :{
-        type: String,
-        requires: true,
+        type: Number,
+        required: true,
     },
     songs:[
         {
             type : mongoose.Schema.Types.ObjectId,
-            ref : "song"
+            ref : "Song"
         },
     ]
 }, {timestamps: true})
 
-export const Album = mongoose.model("Album", alnumSchema)
+export const Album = mongoose.model("Album", albumSchema)
