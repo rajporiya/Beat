@@ -53,7 +53,15 @@ const LeftSideBar = () => {
                     {isLoading ?(
                         <PlaylistSkeleton />
                     ) : (
-                        "Some Music"
+                        albums.map((album: any) => (
+                        <Link to={`/albm/${album._id}`} key={album._id} className='p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer'>
+                        <img src={album.imageUrl}  alt=""  className='size-12 rounded-md flex shrink-0 object-cover'/>
+                        <div className='flex-1 min-w-0 hidden md:block'>
+                            <p className='font-medium truncate'>{album.title}</p>
+                            <p className='text-sm text-zinc-400  truncate'>Album :- {album.artist}</p>
+                            </div>
+                        </Link>
+                        ))
                     )}
                 </div>
             </ScrollArea>
