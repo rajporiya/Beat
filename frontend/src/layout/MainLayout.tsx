@@ -1,5 +1,4 @@
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import React from 'react'
 import { Outlet } from 'react-router-dom'
 import LeftSideBar from './componants/LeftSideBar';
 
