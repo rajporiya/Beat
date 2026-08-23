@@ -34,12 +34,14 @@ export const useMusicStore = create<MusicStore>((set)=>({
     },
     
     fetchAlbumId :async (id : string ) => {
-        set ( { isLoading : true, err : null })
+        set ( { isLoading : true, err : null, curruntAlbum: null })
         try {
             const responce = await axiosInstance.get(`/album/${id}`);
             set({curruntAlbum: responce.data})
         } catch (error : any) {
-            set ( {  err : error.responce.data.message })
+            set({
+                err: error.response?.data?.message ?? "Failed to fetch album",
+                curruntAlbum: null })
         }
         finally{
             set({isLoading : false})

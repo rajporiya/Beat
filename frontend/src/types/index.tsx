@@ -5,8 +5,8 @@ export interface Song {
     albumId : string | null,
     imageUrl : string,
     duration : number,
-    createdAt : Date,
-    updatedAt : Date,
+    createdAt : string,
+    updatedAt : string,
 }
 export interface Album {
     _id : string,
@@ -14,5 +14,5 @@ export interface Album {
     artist : string,
     imageUrl : string,
     releaseYear : number,
-    song : Song[]
+    songs : Song[]
 }
