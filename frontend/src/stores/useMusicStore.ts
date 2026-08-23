@@ -7,7 +7,10 @@ interface MusicStore {
     albums : Album[]
     isLoading: boolean;
     err: string | null;
+    curruntAlbum : Album | null;
+
     fetchAlbums: () => Promise<void>;
+    fetchAlbumId : (id :string) => Promise<void>
 }
 
 export const useMusicStore = create<MusicStore>((set)=>({
@@ -15,6 +18,7 @@ export const useMusicStore = create<MusicStore>((set)=>({
     songs : [],
     isLoading : false,
     err : null,
+    curruntAlbum : null,
 
     fetchAlbums : async ()=>{
         // data fetching
@@ -26,6 +30,19 @@ export const useMusicStore = create<MusicStore>((set)=>({
             set({ err: error.response?.data?.message ?? "Failed to fetch albums" })
         }finally{
             set({ isLoading : false})
+        }
+    },
+    
+    fetchAlbumId :async (id : string ) => {
+        set ( { isLoading : true, err : null })
+        try {
+            const responce = await axiosInstance.get(`/album/${id}`);
+            set({curruntAlbum: responce.data})
+        } catch (error : any) {
+            set ( {  err : error.responce.data.message })
+        }
+        finally{
+            set({isLoading : false})
         }
     }
 }))
