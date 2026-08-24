@@ -7,32 +7,36 @@ type AuthProviderProps = {
   children: ReactNode;
 };
 
-const updateApiToken = (token: string | null) => {
-  if (token) {
-    axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
-  } else {
-    delete axiosInstance.defaults.headers.common.Authorization;
-  }
-};
-
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const { getToken } = useAuth();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        const token = await getToken();
-        updateApiToken(token);
-      } catch (error) {
-        console.error("Error in AuthProvider:", error);
-        updateApiToken(null);
-      } finally {
-        setLoading(false);
+    const requestInterceptor = axiosInstance.interceptors.request.use(
+      async (config) => {
+        try {
+          const token = await getToken();
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          } else {
+            delete config.headers.Authorization;
+          }
+        } catch (error) {
+          console.error("Error fetching token:", error);
+        }
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
       }
-    };
+    );
 
-    initAuth();
+    // Initial auth loading state can be resolved immediately once interceptor is attached
+    setLoading(false);
+
+    return () => {
+      axiosInstance.interceptors.request.eject(requestInterceptor);
+    };
   }, [getToken]);
 
   if (loading) {

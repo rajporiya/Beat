@@ -40,6 +40,12 @@ const FreiendActivity = () => {
                 </div>
             </div>
 
+            {error && (
+                <div className='p-4 text-red-500 text-sm border-b border-zinc-800 bg-red-500/10'>
+                    Failed to load friends: {error}
+                </div>
+            )}
+
             {!user  &&<LoginPrompt /> }
             <ScrollArea className='flex-1'>
                 <div className='p-4 space-y-4'>

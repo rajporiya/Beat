@@ -4,12 +4,13 @@ import { User } from "../models/user.models.js";
 export const authCallback = async (req, res, next)=>{
     try {
         const { id, firstName, lastName, imageUrl} = req.body;
+        const fullName = `${firstName ?? ""} ${lastName ?? ""}`.trim() || "User";
 
         await User.findOneAndUpdate(
             { clerkId: id },
             {
                 clerkId: id,
-                fullName: `${firstName ?? ""} ${lastName ?? ""}`.trim(),
+                fullName,
                 imageUrl,
             },
             { new: true, upsert: true, runValidators: true },
@@ -20,8 +21,7 @@ export const authCallback = async (req, res, next)=>{
         })
     } catch (error) {
         console.log("Error in auth ", error);
-        next()
-        
+        next(error)
     }
 }
 
@@ -45,7 +45,7 @@ export const getFearuresSogs = async (req, res, next)=>{
         res.json(songs)
 
     } catch (error) {
-        
+        next(error)
     }
 }
 export const getMadeForYou = async (req, res, next)=>{
@@ -67,7 +67,7 @@ export const getMadeForYou = async (req, res, next)=>{
         res.json(songs)
 
     } catch (error) {
-        
+        next(error)
     }
 }
 export const getTrending = async (req, res, next)=>{
@@ -89,6 +89,6 @@ export const getTrending = async (req, res, next)=>{
         res.json(songs)
 
     } catch (error) {
-        
+        next(error)
     }
 }
