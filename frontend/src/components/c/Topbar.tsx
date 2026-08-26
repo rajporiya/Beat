@@ -6,9 +6,13 @@ import {
 import { LayoutDashboardIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import SignInOAuthButton from "@/components/SignInOAuthButton";
+import { useAuthStro } from "@/stores/useAuthStro";
 
 export const Topbar = () => {
-  const isAdmin = false;
+  const { isAdmin } = useAuthStro();
+  console.log({isAdmin});
+  
+  
 
   return (
     <div className="flex items-center justify-between p-4 top-0 bg-zinc-900/75 backdrop-blur-md z-10">
