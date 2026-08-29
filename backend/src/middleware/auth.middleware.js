@@ -1,13 +1,12 @@
-import { clerkClient } from '@clerk/express'
+import { clerkClient, getAuth } from '@clerk/express'
 
 export const protectRoute = async (req, res, next) =>{
-    if(!req.auth.userId){
-        // Never print the token itself. This tells us whether the browser sent
-        // one and whether Clerk could validate it.
+    const { userId } = getAuth(req);
+    if(!userId){
         console.warn("Protected request rejected", {
             path: req.originalUrl,
             hasBearerToken: /^Bearer\s+.+/i.test(req.headers.authorization || ""),
-            clerkUserId: req.auth.userId || null,
+            clerkUserId: userId || null,
         });
         return res.status(401).json({
             message: "unauthorized - You",
@@ -21,7 +20,11 @@ export const protectRoute = async (req, res, next) =>{
 
 export const requireAdmin = async (req, res, next ) => {
     try {
-        const currentUser = await clerkClient.users.getUser(req.auth.userId);
+        const { userId } = getAuth(req);
+        if (!userId) {
+            return res.status(401).json({ message: "unauthorized - You" });
+        }
+        const currentUser = await clerkClient.users.getUser(userId);
         const userEmail = currentUser.emailAddresses.find(e => e.id === currentUser.primaryEmailAddressId)?.emailAddress;
         const isAdmin = process.env.ADMIN_EMAIL?.trim().toLowerCase() === userEmail?.trim().toLowerCase();
 
