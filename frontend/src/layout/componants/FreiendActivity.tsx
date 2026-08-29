@@ -3,7 +3,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useChatStore } from '@/stores/useChatStrore'
 import { useUser } from '@clerk/clerk-react';
 import { HeadphonesIcon, Music, User } from 'lucide-react';
-import React, { use, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const LoginPrompt = () => (
   <div className='h-full flex flex-col items-center justify-center p-6 text-center space-y-4'>
@@ -25,7 +25,7 @@ const LoginPrompt = () => (
 );
 
 const FreiendActivity = () => {
-    const { error,fetchUsers,isLoading,users} = useChatStore()
+    const { error,fetchUsers,users} = useChatStore()
     const { user} = useUser()
     const isPlaying = true;
     useEffect(()=>{

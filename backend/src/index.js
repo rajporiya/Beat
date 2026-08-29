@@ -41,7 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoute);
 app.use("/api/song", songRoutes);
 app.use("/api/album", albumRoutes);
-app.use("/api/stats ", stateRoutes);
+app.use("/api/stats", stateRoutes);
 
 app.use((err, req,res,next) =>{
     res.status(500).json ({message: process.env.NODE_ENV === "production" ? "internal error" : err.message})

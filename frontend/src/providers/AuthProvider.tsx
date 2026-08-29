@@ -13,18 +13,28 @@ const updateApiToken =  (token:string | null) => {
   else delete axiosInstance.defaults.headers.common["Authorization"]
 }
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const { getToken } = useAuth();
+  const { getToken, isLoaded, isSignedIn } = useAuth();
   const [loading, setLoading] = useState(true);
-  const { checkAdminStatus } = useAuthStro()
+  const { checkAdminStatus, reset } = useAuthStro()
 
 
     useEffect(()=>{
     const initAuth = async () =>{
+      // Wait for Clerk to create the session before requesting its token.
+      if (!isLoaded) return;
+
       try {
-        const token = await getToken()
+        const token = isSignedIn ? await getToken() : null;
+        console.log("Clerk session diagnostic", {
+          isLoaded,
+          isSignedIn,
+          hasToken: Boolean(token),
+        });
         updateApiToken(token)
         if(token){
           await checkAdminStatus()
+        } else {
+          reset()
         }
       } catch (error) {
         updateApiToken(null)
@@ -35,35 +45,20 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     };
     initAuth()
-  }, [getToken])
+  }, [getToken, isLoaded, isSignedIn, checkAdminStatus, reset])
 
-  // useEffect(() => {
-  //   const requestInterceptor = axiosInstance.interceptors.request.use(
-  //     async (config) => {
-  //       try {
-  //         const token = await getToken();
-  //         if (token) {
-  //           config.headers.Authorization = `Bearer ${token}`;
-  //         } else {
-  //           delete config.headers.Authorization;
-  //         }
-  //       } catch (error) {
-  //         console.error("Error fetching token:", error);
-  //       }
-  //       return config;
-  //     },
-  //     (error) => {
-  //       return Promise.reject(error);
-  //     }
-  //   );
+  // Always obtain the current Clerk token immediately before a protected request.
+  // This also handles a token refreshed after the application first rendered.
+  useEffect(() => {
+    const requestInterceptor = axiosInstance.interceptors.request.use(async (config) => {
+      const token = await getToken();
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      else delete config.headers.Authorization;
+      return config;
+    });
 
-  //   // Initial auth loading state can be resolved immediately once interceptor is attached
-  //   setLoading(false);
-
-  //   return () => {
-  //     axiosInstance.interceptors.request.eject(requestInterceptor);
-  //   };
-  // }, [getToken]);
+    return () => axiosInstance.interceptors.request.eject(requestInterceptor);
+  }, [getToken]);
 
   if (loading) {
     return (

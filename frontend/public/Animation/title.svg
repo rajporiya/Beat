@@ -1,0 +1,151 @@
+<svg
+  width="230"
+  height="230"
+  viewBox="88 88 224 224"
+  xmlns="http://www.w3.org/2000/svg"
+>
+
+  <defs>
+
+    <!-- Main Logo Gradient -->
+    <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF4E8A"/>
+      <stop offset="100%" stop-color="#8B4DFF"/>
+    </linearGradient>
+
+    <!-- Circle Background Gradient -->
+    <radialGradient id="circleBg" cx="30%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#FFF0F8"/>
+      <stop offset="35%" stop-color="#FFD4EA"/>
+      <stop offset="70%" stop-color="#E9C9FF"/>
+      <stop offset="100%" stop-color="#C8A6FF"/>
+    </radialGradient>
+
+  </defs>
+
+  <!-- Main Circle -->
+  <circle
+    cx="200"
+    cy="200"
+    r="110"
+    fill="url(#circleBg)"
+    stroke="url(#grad)"
+    stroke-width="3"
+  />
+
+  <!-- Equalizer -->
+  <g fill="url(#grad)">
+
+    <!-- Bar 1 -->
+    <rect
+      x="125"
+      y="182"
+      width="18"
+      height="36"
+      rx="9"
+    >
+      <animate
+        attributeName="height"
+        values="36;22;36"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="y"
+        values="182;189;182"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+    </rect>
+
+    <!-- Bar 2 -->
+    <rect
+      x="155"
+      y="148"
+      width="20"
+      height="104"
+      rx="10"
+    >
+      <animate
+        attributeName="height"
+        values="104;78;104"
+        dur=".9s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="y"
+        values="148;161;148"
+        dur=".9s"
+        repeatCount="indefinite"
+      />
+    </rect>
+
+    <!-- Center Bar -->
+    <rect
+      x="190"
+      y="118"
+      width="22"
+      height="164"
+      rx="11"
+    >
+      <animate
+        attributeName="height"
+        values="164;132;164"
+        dur="1.2s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="y"
+        values="118;134;118"
+        dur="1.2s"
+        repeatCount="indefinite"
+      />
+    </rect>
+
+    <!-- Bar 4 -->
+    <rect
+      x="225"
+      y="148"
+      width="20"
+      height="104"
+      rx="10"
+    >
+      <animate
+        attributeName="height"
+        values="104;78;104"
+        dur=".85s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="y"
+        values="148;161;148"
+        dur=".85s"
+        repeatCount="indefinite"
+      />
+    </rect>
+
+    <!-- Bar 5 -->
+    <rect
+      x="255"
+      y="182"
+      width="18"
+      height="36"
+      rx="9"
+    >
+      <animate
+        attributeName="height"
+        values="36;22;36"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="y"
+        values="182;189;182"
+        dur="1s"
+        repeatCount="indefinite"
+      />
+    </rect>
+
+  </g>
+
+</svg>

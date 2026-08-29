@@ -19,7 +19,7 @@ export const getStats = async (req,res,next)=>{
                 },
                 {
                     $group : {
-                        _id : "artist",
+                        _id : "$artist",
                     }
                 },
                 {
@@ -40,3 +40,6 @@ export const getStats = async (req,res,next)=>{
         next();
     }
 }
+import { Song } from '../models/song.models.js'
+import { Album } from '../models/album.models.js'
+import { User } from '../models/user.models.js'
