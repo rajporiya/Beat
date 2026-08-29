@@ -8,6 +8,6 @@ const router = Router()
 router.get('/' ,protectRoute,requireAdmin, getAllSongs)
 router.get('/featured' ,getFearuresSogs)
 router.get('/made-for-you', getMadeForYou)
-router.get('/trendig', getTrending)
+router.get('/trending', getTrending)
 
 export default router

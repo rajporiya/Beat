@@ -11,6 +11,14 @@ interface MusicStore {
 
     fetchAlbums: () => Promise<void>;
     fetchAlbumId : (id :string) => Promise<void>
+    fetchFeatureSong :  () => Promise<void>
+    fetchMadeForYouSong :  () => Promise<void>
+    fetchTrendingSong :  () => Promise<void>
+
+    madeForYouSongs : Song[];
+    featureSong : Song[];
+    trendingSong : Song[];
+
 }
 
 export const useMusicStore = create<MusicStore>((set)=>({
@@ -19,6 +27,9 @@ export const useMusicStore = create<MusicStore>((set)=>({
     isLoading : false,
     err : null,
     curruntAlbum : null,
+    madeForYouSongs : [],
+    featureSong : [],
+    trendingSong : [],
 
     fetchAlbums : async ()=>{
         // data fetching
@@ -44,6 +55,48 @@ export const useMusicStore = create<MusicStore>((set)=>({
                 curruntAlbum: null })
         }
         finally{
+            set({isLoading : false})
+        }
+    },
+
+    fetchFeatureSong : async () => {
+        set({isLoading : true, err : null})
+        try {
+            const responce  = await axiosInstance.get("/songs/featured")  
+            set({ featureSong : responce.data})
+        } catch (error : any) {
+            set({
+                err: error.response?.data?.message ?? "Failed to fetch feature song",
+                curruntAlbum: null })
+        }finally{
+            set({isLoading : false})
+        }
+    },
+    
+    fetchTrendingSong : async () => {
+        set({isLoading : true, err : null})
+        try {
+            const responce  = await axiosInstance.get("/songs/made-for-you")  
+            set({ featureSong : responce.data})
+        } catch (error : any) {
+            set({
+                err: error.response?.data?.message ?? "Failed to fetch feature song",
+                curruntAlbum: null })
+        }finally{
+            set({isLoading : false})
+        }
+    },
+
+    fetchMadeForYouSong : async () => {
+        set({isLoading : true, err : null})
+        try {
+            const responce  = await axiosInstance.get("/songs/trending")  
+            set({ featureSong : responce.data})
+        } catch (error : any) {
+            set({
+                err: error.response?.data?.message ?? "Failed to fetch feature song",
+                curruntAlbum: null })
+        }finally{
             set({isLoading : false})
         }
     }
