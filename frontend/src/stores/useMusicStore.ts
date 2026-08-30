@@ -62,7 +62,7 @@ export const useMusicStore = create<MusicStore>((set)=>({
     fetchFeatureSong : async () => {
         set({isLoading : true, err : null})
         try {
-            const responce  = await axiosInstance.get("/songs/featured")  
+            const responce  = await axiosInstance.get("/song/featured")
             set({ featureSong : responce.data})
         } catch (error : any) {
             set({
@@ -76,11 +76,11 @@ export const useMusicStore = create<MusicStore>((set)=>({
     fetchTrendingSong : async () => {
         set({isLoading : true, err : null})
         try {
-            const responce  = await axiosInstance.get("/songs/made-for-you")  
-            set({ featureSong : responce.data})
+            const responce  = await axiosInstance.get("/song/trending")
+            set({ trendingSong : responce.data})
         } catch (error : any) {
             set({
-                err: error.response?.data?.message ?? "Failed to fetch feature song",
+                err: error.response?.data?.message ?? "Failed to fetch trending songs",
                 curruntAlbum: null })
         }finally{
             set({isLoading : false})
@@ -90,11 +90,11 @@ export const useMusicStore = create<MusicStore>((set)=>({
     fetchMadeForYouSong : async () => {
         set({isLoading : true, err : null})
         try {
-            const responce  = await axiosInstance.get("/songs/trending")  
-            set({ featureSong : responce.data})
+            const responce  = await axiosInstance.get("/song/made-for-you")
+            set({ madeForYouSongs : responce.data})
         } catch (error : any) {
             set({
-                err: error.response?.data?.message ?? "Failed to fetch feature song",
+                err: error.response?.data?.message ?? "Failed to fetch made-for-you songs",
                 curruntAlbum: null })
         }finally{
             set({isLoading : false})
