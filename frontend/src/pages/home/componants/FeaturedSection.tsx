@@ -1,6 +1,7 @@
 import FeatureGridSkeleton from '@/components/skeleton/FeatureGridSkeleton'
 import { getFallbackArtwork } from '@/lib/songArtwork'
 import { useMusicStore } from '@/stores/useMusicStore'
+import PlayButton from './PlayButton'
 
 const FeaturedSection = () => {
     const { isLoading, featureSong, err} = useMusicStore()
@@ -26,6 +27,7 @@ const FeaturedSection = () => {
                     <p className='text-sm text-zinc-600'>{song.artist}</p>
 
                 </div>
+                <PlayButton song={song} />
             </div>
         ))}
 
