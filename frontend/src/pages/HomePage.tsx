@@ -4,13 +4,22 @@ import { useEffect } from "react";
 import FeaturedSection from "./home/componants/FeaturedSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SectionGrid from "./home/componants/SectionGrid";
+import { usePlayStore } from "@/stores/usePlayerStore";
 
 const HomePage = () => {
-  const { fetchFeatureSong, fetchMadeForYouSong, fetchTrendingSong, isLoading, madeForYouSongs, trendingSong } = useMusicStore()
+  const {  featureSong, fetchFeatureSong, fetchMadeForYouSong, fetchTrendingSong, isLoading, madeForYouSongs, trendingSong } = useMusicStore()
   useEffect(()=>{
     fetchFeatureSong(), fetchMadeForYouSong(),fetchTrendingSong()
   }, [fetchFeatureSong, fetchMadeForYouSong,fetchTrendingSong ])
 
+  const { initalizeQueue} = usePlayStore()
+
+  useEffect(()=>{
+    if(madeForYouSongs.length > 0 && featureSong.length > 0 && trendingSong.length > 0){
+      const allSongs = [...featureSong, ...madeForYouSongs, ...trendingSong]
+      initalizeQueue(allSongs)
+    }
+  },[initalizeQueue,featureSong,madeForYouSongs,trendingSong])
   return (
     <main className="rounded-md overflow-hidden h-full ">
       <Topbar />

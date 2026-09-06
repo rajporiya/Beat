@@ -3,14 +3,23 @@ import { Outlet } from 'react-router-dom'
 import LeftSideBar from './componants/LeftSideBar';
 import FreiendActivity from './componants/FreiendActivity';
 import AudioPlayer from './AudioPlayer';
+import PlayBackControl from './componants/PlayBackControl';
+import { useEffect, useState } from 'react';
 
 const MainLayout = () => {
-  const isMobile = false;
+  const [isMobile, setIsMobile] = useState(false)
   
+  useEffect(()=>{
+    const checkMobile = () =>{
+      setIsMobile(window.innerWidth < 768)
+      return () => window.removeEventListener("resize", checkMobile)
+    }
+  }, [])
   return (
     <div className='h-screen bg-black text-white flex flex-col'>
       <ResizablePanelGroup orientation='horizontal' className='h-full flex flex-1 overflow-hidden p-2'>
         <AudioPlayer />
+
         <ResizablePanel defaultSize={200}  minSize={isMobile ? 0 : 10} maxSize={300}>
           {/* left */}
           <LeftSideBar />
@@ -25,13 +34,18 @@ const MainLayout = () => {
           </div>
         </ResizablePanel>
 
-        <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
+        {!isMobile && (
+          <>
+          <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
 
         {/* right */}
         <ResizablePanel defaultSize={20} minSize={0} maxSize={250} collapsedSize={0}>
           <FreiendActivity />
         </ResizablePanel>
+        </>
+        )}
       </ResizablePanelGroup>
+      <PlayBackControl />
     </div>
   )
 }
