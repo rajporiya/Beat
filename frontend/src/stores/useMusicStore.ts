@@ -1,5 +1,5 @@
 import { axiosInstance } from "@/lib/axios";
-import type { Album, Song } from "@/types";
+import type { Album, Song, Stats } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
@@ -14,11 +14,16 @@ interface MusicStore {
     fetchFeatureSong :  () => Promise<void>
     fetchMadeForYouSong :  () => Promise<void>
     fetchTrendingSong :  () => Promise<void>
+    fetchSongs :  () => Promise<void>
+    fetchStats : () =>  Promise<void>
+
 
     madeForYouSongs : Song[];
     featureSong : Song[];
     trendingSong : Song[];
+    stats  : Stats
 
+    
 }
 
 export const useMusicStore = create<MusicStore>((set)=>({
@@ -30,6 +35,14 @@ export const useMusicStore = create<MusicStore>((set)=>({
     madeForYouSongs : [],
     featureSong : [],
     trendingSong : [],
+    stats :{
+        totalSongs : 0,
+        totalAlbums : 0,
+        totalUsers : 0,
+        totalArtists : 0,
+    },
+    // isSongsLoading : false ,
+    // isStatsLoading : false ,
 
     fetchAlbums : async ()=>{
         // data fetching
@@ -96,6 +109,28 @@ export const useMusicStore = create<MusicStore>((set)=>({
             set({
                 err: error.response?.data?.message ?? "Failed to fetch made-for-you songs",
                 curruntAlbum: null })
+        }finally{
+            set({isLoading : false})
+        }
+    },
+    fetchSongs : async ()=>{
+        set({ isLoading : true, err : null})
+        try {
+            const responce  = await axiosInstance.get("/song")
+            set({ songs : responce.data})
+        } catch (error : any) {
+            set({ err: error.message })
+        }finally{
+            set({isLoading : false})
+        }
+    },
+    fetchStats : async ()=>{
+        set({ isLoading : true, err : null})
+        try {
+            const responce  = await axiosInstance.get("stats")
+             set({ songs : responce.data})
+        } catch (error : any) {
+            set({ err: error.message })
         }finally{
             set({isLoading : false})
         }
