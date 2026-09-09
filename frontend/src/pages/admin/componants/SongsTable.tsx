@@ -3,6 +3,7 @@ import { useMusicStore } from "@/stores/useMusicStore";
 
 const SongsTable = () => {
   const { songs, isLoading, err } = useMusicStore();
+  const songList = Array.isArray(songs) ? songs : [];
 
   if (isLoading) {
     return (
@@ -33,7 +34,7 @@ const SongsTable = () => {
       </TableHeader>
 
       <TableBody>
-        {songs.map((song) => (
+        {songList.map((song) => (
           <TableRow className="hover:bg-zinc-800/50" key={song._id}>
             <TableCell>
               <img src={song.imageUrl} alt={song.title} className="size-10 rounded object-cover" />
