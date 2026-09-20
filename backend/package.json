@@ -6,8 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "seed:songs" : "node src/seeds/songs.js",
-    "seed:albums" : "node src/seeds/albums.js"
+    "seed:songs": "node src/seeds/songs.js",
+    "seed:albums": "node src/seeds/albums.js"
   },
   "keywords": [],
   "type": "module",
@@ -16,13 +16,18 @@
   "description": "",
   "dependencies": {
     "@clerk/express": "^2.1.56",
+    "bcryptjs": "^3.0.3",
     "cloudinary": "^2.10.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-fileupload": "^1.5.2",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.2",
-    "socket.io": "^4.8.3"
+    "multer": "^2.4.0",
+    "socket.io": "^4.8.3",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

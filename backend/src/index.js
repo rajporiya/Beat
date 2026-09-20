@@ -12,6 +12,8 @@ import { connectDb } from './lib/db.js'
 import fileUpload from 'express-fileupload'
 import path from 'path'
 import cors from "cors"
+import cookieParser from "cookie-parser"
+import v1Routes from "./routes/v1.route.js"
 
 dotenv.config()
 const app = express()
@@ -20,12 +22,13 @@ const PORT = process.env.PORT || 4561
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(clerkMiddleware())
 
 app.use(fileUpload({
@@ -42,9 +45,12 @@ app.use("/api/admin", adminRoute);
 app.use("/api/song", songRoutes);
 app.use("/api/album", albumRoutes);
 app.use("/api/stats", stateRoutes);
+app.get("/api/v1/health", (_req, res) => res.status(200).json({ success: true, message: "Music API is running" }));
+app.use("/api/v1", v1Routes);
 
 app.use((err, req,res,next) =>{
-    res.status(500).json ({message: process.env.NODE_ENV === "production" ? "internal error" : err.message})
+    const status = err.status || 500;
+    res.status(status).json({ success: false, message: status === 500 && process.env.NODE_ENV === "production" ? "Internal server error" : err.message, error: null });
 })
 app.listen(PORT, ()=>{
     console.log(`Server is running on port ${PORT}`);
