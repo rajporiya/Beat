@@ -11,6 +11,7 @@ type SectionGridProps = {
 }
 const SectionGrid = ({title,songs, isLoading} : SectionGridProps) => {
   if(isLoading) return <SectionGridSkeleton />
+  if(!songs.length) return null
   
   return (
     <div className='mb-8 '>

@@ -70,14 +70,23 @@ const PlayBackControl = () => {
 
   return (
     <footer className="mb-16 h-20 shrink-0 border-t border-white/10 bg-zinc-950 px-3 sm:h-24 sm:px-4 md:mb-0">
-      <div className="mx-auto grid h-full max-w-[1800px] grid-cols-[minmax(180px,1fr)_minmax(280px,560px)_minmax(180px,1fr)] items-center gap-4 sm:gap-6">
-        <div className="hidden min-w-0 items-center gap-3 sm:flex">
+      <div className="mx-auto grid h-full max-w-[1800px] grid-cols-[minmax(120px,1fr)_minmax(0,2fr)_minmax(120px,1fr)] items-center gap-2 sm:grid-cols-[minmax(180px,1fr)_minmax(280px,560px)_minmax(180px,1fr)] sm:gap-6">
+        <div className="flex min-w-0 items-center gap-3">
           {currentSong ? (
             <>
-              <img src={currentSong.imageUrl} alt={currentSong.title} className="size-14 shrink-0 rounded object-cover" />
+              <img
+                src={currentSong.imageUrl}
+                onError={(event) => {
+                  if (!event.currentTarget.src.startsWith("https://placehold.co")) {
+                    event.currentTarget.src = `https://placehold.co/600x600/27272a/f5d0fe?text=${encodeURIComponent(currentSong.title)}`;
+                  }
+                }}
+                alt={currentSong.title}
+                className="size-12 shrink-0 rounded object-cover sm:size-14"
+              />
               <div className="min-w-0 leading-tight">
                 <p className="truncate text-sm font-medium text-white hover:underline">{currentSong.title}</p>
-                <p className="mt-1 truncate text-xs text-zinc-400 hover:text-white hover:underline">{currentSong.artist}</p>
+                <p className="mt-1 hidden truncate text-xs text-zinc-400 hover:text-white hover:underline sm:block">{currentSong.artist}</p>
               </div>
             </>
           ) : (

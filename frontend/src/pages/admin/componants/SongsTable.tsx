@@ -3,17 +3,22 @@ import { useMusicStore } from "@/stores/useMusicStore";
 import { axiosInstance } from "@/lib/axios";
 import { Loader2, Trash2 } from "lucide-react";
 import { useState } from "react";
+import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import type { Song } from "@/types";
 
 const SongsTable = () => {
   const { songs, isLoading, err, fetchSongs, fetchAlbums, fetchStats } = useMusicStore();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [songToDelete, setSongToDelete] = useState<Song | null>(null);
   const songList = Array.isArray(songs) ? songs : [];
 
-  const handleDelete = async (id: string) => {
-    setDeletingId(id);
+  const confirmDelete = async () => {
+    if (!songToDelete) return;
+    setDeletingId(songToDelete._id);
     try {
-      await axiosInstance.delete(`/admin/songs/${id}`);
+      await axiosInstance.delete(`/admin/songs/${songToDelete._id}`);
       await Promise.all([fetchSongs(), fetchAlbums(), fetchStats()]);
+      setSongToDelete(null);
     } catch (error) {
       console.error("Failed to delete song:", error);
     } finally {
@@ -38,7 +43,8 @@ const SongsTable = () => {
   }
 
   return (
-    <Table>
+    <>
+      <Table>
       <TableHeader>
         <TableRow className="hover:bg-zinc-800/50">
           <TableHead className="w-[50px]"> </TableHead>
@@ -61,7 +67,7 @@ const SongsTable = () => {
             <TableCell className="text-right">
               <button
                 aria-label={`Delete ${song.title}`}
-                onClick={() => handleDelete(song._id)}
+                onClick={() => setSongToDelete(song)}
                 className="grid size-8 place-items-center rounded-full text-zinc-400 hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
                 disabled={deletingId === song._id}
               >
@@ -75,6 +81,15 @@ const SongsTable = () => {
         )}
       </TableBody>
     </Table>
+      <ConfirmDeleteModal
+        open={songToDelete !== null}
+        title={`Delete "${songToDelete?.title}"?`}
+        message="This will permanently remove the song from your music catalog."
+        loading={deletingId !== null}
+        onCancel={() => setSongToDelete(null)}
+        onConfirm={confirmDelete}
+      />
+    </>
   );
 };
 

@@ -32,11 +32,12 @@ app.use(cookieParser())
 app.use(clerkMiddleware())
 
 app.use(fileUpload({
-    userTempFiles : true,
+    useTempFiles : true,
     tempFileDir : path.join(__dirname, "tmp"),
     createParentPath : true,
     limits : {
-        fieldSize : 10 * 1024 * 1024 // max file size
+        fieldSize : 10 * 1024 * 1024, // max field size
+        fileSize : 50 * 1024 * 1024, // max file size
     }
 }))
 app.use("/api/user", userRoutes);

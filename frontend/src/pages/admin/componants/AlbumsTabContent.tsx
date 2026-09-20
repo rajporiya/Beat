@@ -1,21 +1,28 @@
 import { useMusicStore } from '@/stores/useMusicStore'
 import { Disc3, Loader2, Music2, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { axiosInstance } from '@/lib/axios'
 import { getFallbackArtwork } from '@/lib/songArtwork'
 import AddAlbumModal from './AddAlbumModal'
+import ConfirmDeleteModal from './ConfirmDeleteModal'
+import AlbumDetailModal from './AlbumDetailModal'
+import type { Album } from '@/types'
 
 const AlbumsTabContent = () => {
   const { albums, fetchAlbums, fetchSongs, fetchStats } = useMusicStore()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [albumToDelete, setAlbumToDelete] = useState<Album | null>(null)
+  const [selectedAlbum, setSelectedAlbum] = useState<Album | null>(null)
 
-  const handleDelete = async (id: string) => {
-    setDeletingId(id)
+  const confirmDelete = async () => {
+    if (!albumToDelete) return
+    setDeletingId(albumToDelete._id)
     try {
-      await axiosInstance.delete(`/admin/albums/${id}`)
+      await axiosInstance.delete(`/admin/albums/${albumToDelete._id}`)
       await Promise.all([fetchAlbums(), fetchSongs(), fetchStats()])
+      if (selectedAlbum?._id === albumToDelete._id) setSelectedAlbum(null)
+      setAlbumToDelete(null)
     } catch (error) {
       console.error("Failed to delete album:", error)
     } finally {
@@ -32,7 +39,7 @@ const AlbumsTabContent = () => {
       <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
         {albums.map((album) => (
           <div key={album._id} className='group relative rounded-lg p-3 hover:bg-[#282828]'>
-            <Link to={`/album/${album._id}`} className='block'>
+            <button onClick={() => setSelectedAlbum(album)} className='block w-full text-left'>
               {album.imageUrl ? (
                 <img
                   src={album.imageUrl}
@@ -47,10 +54,10 @@ const AlbumsTabContent = () => {
               )}
               <p className='mt-3 truncate font-bold'>{album.title}</p>
               <p className='mt-1 truncate text-sm text-zinc-400'>{album.artist} • {album.releaseYear}</p>
-            </Link>
+            </button>
             <button
               aria-label={`Delete ${album.title}`}
-              onClick={() => handleDelete(album._id)}
+              onClick={() => setAlbumToDelete(album)}
               className='absolute right-5 top-5 grid size-8 place-items-center rounded-full bg-black/60 text-zinc-300 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100 disabled:opacity-50'
               disabled={deletingId === album._id}
             >
@@ -61,6 +68,19 @@ const AlbumsTabContent = () => {
       </div>
       {!albums.length && <div className='py-12 text-center text-zinc-500'><Music2 className='mx-auto mb-3 size-7' />No albums have been added yet.</div>}
       <AddAlbumModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ConfirmDeleteModal
+        open={albumToDelete !== null}
+        title={`Delete "${albumToDelete?.title}"?`}
+        message="This will permanently remove the album and its songs from your library."
+        loading={deletingId !== null}
+        onCancel={() => setAlbumToDelete(null)}
+        onConfirm={confirmDelete}
+      />
+      <AlbumDetailModal
+        open={selectedAlbum !== null}
+        album={selectedAlbum}
+        onClose={() => setSelectedAlbum(null)}
+      />
     </section>
   )
 }

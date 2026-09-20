@@ -9,16 +9,26 @@ type AddSongModalProps = {
   open: boolean;
   onClose: () => void;
   albums: Album[];
+  defaultAlbumId?: string;
 };
 
 const inputClass =
   "mt-2 w-full rounded-md border border-zinc-600 bg-[#242424] p-3 text-sm text-white outline-none focus:border-[#22c55e]";
 const labelClass = "block text-sm font-semibold text-white";
 
-const AddSongModal = ({ open, onClose, albums }: AddSongModalProps) => {
+const AddSongModal = ({ open, onClose, albums, defaultAlbumId }: AddSongModalProps) => {
   const { fetchSongs, fetchAlbums, fetchStats } = useMusicStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const getAudioDuration = (file: File) =>
+    new Promise<number>((resolve) => {
+      const audio = new Audio();
+      audio.preload = "metadata";
+      audio.onloadedmetadata = () => resolve(audio.duration || 0);
+      audio.onerror = () => resolve(0);
+      audio.src = URL.createObjectURL(file);
+    });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,7 +55,8 @@ const AddSongModal = ({ open, onClose, albums }: AddSongModalProps) => {
     const data = new FormData();
     data.append("title", title);
     data.append("artist", artist);
-    data.append("duration", String(formData.get("duration") ?? 0));
+    const duration = await getAudioDuration(audioFile);
+    data.append("duration", String(Math.round(duration) || 0));
     data.append("albumId", String(formData.get("albumId") ?? ""));
     data.append("audioFile", audioFile);
     data.append("imageFile", imageFile);
@@ -74,7 +85,7 @@ const AddSongModal = ({ open, onClose, albums }: AddSongModalProps) => {
         </label>
         <label className={labelClass}>
           Album
-          <select name="albumId" className={inputClass} defaultValue="">
+          <select name="albumId" className={inputClass} defaultValue={defaultAlbumId ?? ""}>
             <option value="">No album</option>
             {albums.map((album) => (
               <option key={album._id} value={album._id}>
@@ -82,10 +93,6 @@ const AddSongModal = ({ open, onClose, albums }: AddSongModalProps) => {
               </option>
             ))}
           </select>
-        </label>
-        <label className={labelClass}>
-          Duration (seconds)
-          <input name="duration" type="number" min="0" placeholder="0" className={inputClass} />
         </label>
         <label className={labelClass}>
           Song file (mp3)

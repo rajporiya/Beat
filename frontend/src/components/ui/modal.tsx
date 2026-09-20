@@ -1,14 +1,16 @@
 import { X } from "lucide-react";
 import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type ModalProps = {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  className?: string;
 };
 
-const Modal = ({ open, onClose, title, children }: ModalProps) => {
+const Modal = ({ open, onClose, title, children, className }: ModalProps) => {
   if (!open) return null;
   return (
     <div
@@ -16,7 +18,7 @@ const Modal = ({ open, onClose, title, children }: ModalProps) => {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-2xl bg-[#181818] p-6 shadow-2xl"
+        className={cn("w-full max-w-md rounded-2xl bg-[#181818] p-6 shadow-2xl", className)}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">

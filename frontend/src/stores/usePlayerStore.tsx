@@ -22,7 +22,13 @@ export const usePlayStore = create<PlayerStore>((set,get) =>({
     currentIndex : -1,
 
     initalizeQueue : ( songs : Song[]) => {
-        set({ queue : songs })
+        const { queue, currentSong, currentIndex } = get()
+        const shouldResetIndex = queue.length !== songs.length
+        set({
+            queue : songs,
+            currentSong : currentSong || songs[0] || null,
+            currentIndex : shouldResetIndex ? (songs.length ? 0 : -1) : currentIndex,
+        })
     },
     playerAlbum : ( songs : Song[], startIndex = 0) => {
         if(songs.length === 0 ) return

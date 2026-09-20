@@ -10,8 +10,7 @@ const uploadToCloudinary = async (file) =>{
         return result.secure_url    
     } catch (error) {
         console.log("Error i uploadCloudinary ", error);
-        throw new Error("uploadCloudinary",errors)
-        
+        throw new Error(`uploadCloudinary: ${error.message}`) 
     }
 }
 
@@ -96,6 +95,78 @@ export const createAlbum  = async (req,res, next) => {
     } catch (error) {
         console.log("error from create album", error.message);
         res.status(500).json({message: "Failed to create album", error: error?.message})
+    }
+}
+
+export const updateAlbum = async (req,res, next) => {
+    try {
+        const { id } = req.params
+        const { title, artist, releaseYear } = req.body
+
+        const album = await Album.findById(id)
+        if(!album){
+            return res.status(404).json({ message : "Album not found" })
+        }
+        if (title?.trim()) album.title = title.trim()
+        if (artist?.trim()) album.artist = artist.trim()
+        if (releaseYear) album.releaseYear = Number(releaseYear) || album.releaseYear
+        if (req.files?.imageFile){
+            album.imageUrl = await uploadToCloudinary(req.files.imageFile)
+        }
+        await album.save()
+
+        const populated = await Album.findById(id).populate("songs")
+        res.status(200).json(populated)
+    } catch (error) {
+        console.log("error from update album", error.message);
+        res.status(500).json({ message: "Failed to update album", error: error?.message })
+    }
+}
+
+export const addSongsToAlbum = async (req,res, next) => {
+    try {
+        const { id } = req.params
+        const { songIds } = req.body
+
+        const album = await Album.findById(id)
+        if(!album){
+            return res.status(404).json({ message : "Album not found" })
+        }
+        const ids = Array.isArray(songIds) ? songIds : []
+        if(!ids.length){
+            return res.status(400).json({ message : "songIds array is required" })
+        }
+
+        await Song.updateMany(
+            { _id: { $in: ids } },
+            { $set: { albumId: id } }
+        )
+        await Album.findByIdAndUpdate(id, { $addToSet: { songs: { $each: ids } } })
+
+        const populated = await Album.findById(id).populate("songs")
+        res.status(200).json(populated)
+    } catch (error) {
+        console.log("error add songs to album", error.message);
+        res.status(500).json({ message: "Failed to add songs to album", error: error?.message })
+    }
+}
+
+export const removeSongFromAlbum = async (req,res, next) => {
+    try {
+        const { id, songId } = req.params
+
+        const album = await Album.findById(id)
+        if(!album){
+            return res.status(404).json({ message : "Album not found" })
+        }
+        await Album.findByIdAndUpdate(id, { $pull: { songs: songId } })
+        await Song.findByIdAndUpdate(songId, { $set: { albumId: null } })
+
+        const populated = await Album.findById(id).populate("songs")
+        res.status(200).json(populated)
+    } catch (error) {
+        console.log("error remove song from album", error.message);
+        res.status(500).json({ message: "Failed to remove song from album", error: error?.message })
     }
 }
 

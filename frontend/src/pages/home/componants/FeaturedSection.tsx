@@ -4,14 +4,17 @@ import { useMusicStore } from '@/stores/useMusicStore'
 import PlayButton from './PlayButton'
 
 const FeaturedSection = () => {
-    const { isLoading, featureSong, err} = useMusicStore()
+    const { isLoading, featureSong } = useMusicStore()
 
     if (isLoading) return <FeatureGridSkeleton />
-    if(err) return <p className='text-red-500 mb-4 text-lg'>{err}</p>
+    if (!featureSong.length) return null
+
   return (
-    <div className='px-5 pt-2 grid grid-cols-1 gap-3 mb-8 md:grid-cols-2 xl:grid-cols-3'>
+    <section>
+      <h2 className="mb-4 text-xl font-bold tracking-tight sm:text-2xl">Made for you</h2>
+      <div className='grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3'>
         {featureSong.map((song) => (
-            <div className='flex items-center bg-white/10 rounded-md overflow-hidden hover:bg-white/20 transition-colors group cursor-pointer relative shadow-sm' key={song._id}>
+            <div className='group relative flex items-center gap-4 rounded-md bg-white/10 p-3 pr-4 overflow-hidden transition-colors hover:bg-white/20' key={song._id}>
                 <img
                     src={song.imageUrl}
                     onError={(event) => {
@@ -19,19 +22,18 @@ const FeaturedSection = () => {
                             event.currentTarget.src = getFallbackArtwork(song.title)
                         }
                     }}
-                    className='w-16 h-16 object-cover shrink-0'
+                    className='h-16 w-16 shrink-0 rounded-full object-cover shadow sm:h-20 sm:w-20'
                     alt={`${song.title} cover`}
                 />
-                <div className='px-4 min-w-0'>
-                    <p className='font-bold truncate'>{song.title}</p>
-                    <p className='text-sm text-zinc-400 truncate'>{song.artist}</p>
-
+                <div className='min-w-0 flex-1'>
+                    <p className='truncate font-bold'>{song.title}</p>
+                    <p className='mt-1 truncate text-sm text-zinc-400'>{song.artist}</p>
                 </div>
                 <PlayButton song={song} />
             </div>
         ))}
-
-    </div>
+      </div>
+    </section>
   )
 }
 
