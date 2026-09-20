@@ -183,6 +183,36 @@ export const deleteAlbum = async (req,res, next) => {
     }
 }
 
+export const getArtists = async (req,res, next) => {
+    try {
+        const artists = await Song.aggregate([
+            {
+                $unionWith: {
+                    coll : "albums",
+                    pipeline : [],
+                }
+            },
+            {
+                $match: {
+                    artist: { $type: "string", $ne: "" },
+                }
+            },
+            {
+                $group: {
+                    _id: "$artist",
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ])
+        res.status(200).json(artists.map((item) => item._id))
+    } catch (error) {
+        console.log("error from get artists", error.message);
+        next(error)
+    }
+}
+
 export const checkAdmin = async (req,res,next) =>{
     res.status(200).json({admin:true})
 }

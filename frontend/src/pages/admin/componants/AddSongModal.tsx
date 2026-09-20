@@ -17,9 +17,14 @@ const inputClass =
 const labelClass = "block text-sm font-semibold text-white";
 
 const AddSongModal = ({ open, onClose, albums, defaultAlbumId }: AddSongModalProps) => {
-  const { fetchSongs, fetchAlbums, fetchStats } = useMusicStore();
+  const { fetchSongs, fetchAlbums, fetchStats, artists } = useMusicStore();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [artistChoice, setArtistChoice] = useState("");
+  const [newArtist, setNewArtist] = useState("");
+
+  const isNewArtist = artistChoice === "__new__";
+  const artist = isNewArtist ? newArtist.trim() : artistChoice;
 
   const getAudioDuration = (file: File) =>
     new Promise<number>((resolve) => {
@@ -39,7 +44,6 @@ const AddSongModal = ({ open, onClose, albums, defaultAlbumId }: AddSongModalPro
     const audioFile = formData.get("audioFile") as File;
     const imageFile = formData.get("imageFile") as File;
     const title = String(formData.get("title") ?? "").trim();
-    const artist = String(formData.get("artist") ?? "").trim();
 
     if (!title || !artist) {
       setError("Title and artist are required.");
@@ -81,8 +85,25 @@ const AddSongModal = ({ open, onClose, albums, defaultAlbumId }: AddSongModalPro
         </label>
         <label className={labelClass}>
           Artist
-          <input required name="artist" placeholder="Artist name" className={inputClass} />
+          <select value={artistChoice} onChange={(event) => setArtistChoice(event.target.value)} className={inputClass}>
+            <option value="">Select artist</option>
+            {artists.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+            <option value="__new__">New artist...</option>
+          </select>
         </label>
+        {isNewArtist && (
+          <label className={labelClass}>
+            New artist name
+            <input
+              value={newArtist}
+              onChange={(event) => setNewArtist(event.target.value)}
+              placeholder="Artist name"
+              className={inputClass}
+            />
+          </label>
+        )}
         <label className={labelClass}>
           Album
           <select name="albumId" className={inputClass} defaultValue={defaultAlbumId ?? ""}>

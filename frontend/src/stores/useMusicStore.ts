@@ -5,6 +5,7 @@ import { create } from "zustand";
 interface MusicStore {
     songs : Song[],
     albums : Album[]
+    artists : string[]
     isLoading: boolean;
     err: string | null;
     curruntAlbum : Album | null;
@@ -16,6 +17,7 @@ interface MusicStore {
     fetchTrendingSong :  () => Promise<void>
     fetchSongs :  () => Promise<void>
     fetchStats : () =>  Promise<void>
+    fetchArtists : () =>  Promise<void>
 
 
     madeForYouSongs : Song[];
@@ -29,6 +31,7 @@ interface MusicStore {
 export const useMusicStore = create<MusicStore>((set)=>({
     albums : [],
     songs : [],
+    artists : [],
     isLoading : false,
     err : null,
     curruntAlbum : null,
@@ -124,7 +127,7 @@ export const useMusicStore = create<MusicStore>((set)=>({
             set({isLoading : false})
         }
     },
-    fetchStats : async ()=>{
+fetchStats : async ()=>{
         set({ isLoading : true, err : null})
         try {
             const responce  = await axiosInstance.get("/stats")
@@ -133,6 +136,14 @@ export const useMusicStore = create<MusicStore>((set)=>({
             set({ err: error.message })
         }finally{
             set({isLoading : false})
+        }
+    },
+    fetchArtists : async ()=>{
+        try {
+            const responce  = await axiosInstance.get("/admin/artists")
+            set({ artists : responce.data })
+        } catch (error : any) {
+            console.error("Failed to fetch artists:", error.response?.data?.message ?? error.message)
         }
     }
 }))

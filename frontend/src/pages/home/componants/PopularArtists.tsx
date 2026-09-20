@@ -1,5 +1,6 @@
 import { getFallbackArtwork } from "@/lib/songArtwork";
 import { useMusicStore } from "@/stores/useMusicStore";
+import { Link } from "react-router-dom";
 
 export default function PopularArtists() {
   const { featureSong, trendingSong, madeForYouSongs } = useMusicStore();
@@ -12,7 +13,11 @@ export default function PopularArtists() {
       <h2 className="mb-4 text-xl font-bold tracking-tight sm:text-2xl">Popular artists</h2>
       <div className="flex gap-4 overflow-x-auto pb-2">
         {artists.map((song) => (
-          <article key={song.artist} className="group w-36 shrink-0 rounded-lg p-3 transition-colors hover:bg-[#282828]">
+          <Link
+            key={song.artist}
+            to={`/artist/${song.artist.toLowerCase().replaceAll(" ", "-")}`}
+            className="group w-36 shrink-0 rounded-lg p-3 transition-colors hover:bg-[#282828]"
+          >
             <img
               src={song.imageUrl}
               onError={(event) => {
@@ -25,7 +30,7 @@ export default function PopularArtists() {
             />
             <h3 className="mt-3 truncate font-bold">{song.artist}</h3>
             <p className="mt-1 text-sm text-zinc-400">Artist</p>
-          </article>
+          </Link>
         ))}
       </div>
     </section>
