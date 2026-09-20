@@ -224,6 +224,27 @@ export const getUsers = async (req,res, next) => {
     }
 }
 
+export const deleteArtist = async (req,res, next) => {
+    try {
+        const { name } = req.params
+        const artistName = decodeURIComponent(name)
+
+        const songs = await Song.find({ artist: artistName })
+        const songIds = songs.map((song) => song._id)
+
+        await Promise.all([
+            Album.updateMany({ songs: { $in: songIds } }, { $pull: { songs: { $in: songIds } } }),
+            Song.deleteMany({ artist: artistName }),
+            Album.deleteMany({ artist: artistName }),
+        ])
+
+        res.status(200).json({ message: "Artist deleted successfully" })
+    } catch (error) {
+        console.log("error from delete artist", error.message);
+        next(error)
+    }
+}
+
 export const checkAdmin = async (req,res,next) =>{
     res.status(200).json({admin:true})
 }
