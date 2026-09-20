@@ -13,6 +13,8 @@ const HomePage = () => {
   }, [fetchFeatureSong, fetchMadeForYouSong,fetchTrendingSong ])
 
   const { initalizeQueue} = usePlayStore()
+  const hour = new Date().getHours()
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening"
 
   useEffect(()=>{
     if(madeForYouSongs.length > 0 && featureSong.length > 0 && trendingSong.length > 0){
@@ -26,7 +28,7 @@ const HomePage = () => {
       <FeaturedSection />
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="space-y-10 p-5 sm:p-7">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Good afternoon</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{greeting}</h1>
           <SectionGrid  title="Made for you" songs={madeForYouSongs} isLoading={isLoading}/>
           <SectionGrid  title="Trending" songs={trendingSong} isLoading={isLoading}/>
         </div>

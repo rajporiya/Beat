@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { useMusicStore } from '@/stores/useMusicStore'
 import { SignedIn } from '@clerk/clerk-react'
-import { HomeIcon, Library, MessageCircle, Plus, Search } from 'lucide-react'
+import { Clock3, Heart, HomeIcon, Library, MessageCircle, Plus, Search } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -26,6 +26,8 @@ const LeftSideBar = () => {
                 ))}>
 
                 <HomeIcon  className='mr-2 size-5'/><span className='hidden md:block'>Home</span></Link>
+                <Link to={"/search"} className={cn(buttonVariants({ variant:"ghost", className: "w-full justify-start rounded-md text-zinc-300 hover:bg-zinc-800 hover:text-white" }))}><Search className='mr-2 size-5'/><span className='hidden md:block'>Search</span></Link>
+                <Link to={"/library"} className={cn(buttonVariants({ variant:"ghost", className: "w-full justify-start rounded-md text-zinc-300 hover:bg-zinc-800 hover:text-white" }))}><Library className='mr-2 size-5'/><span className='hidden md:block'>Your Library</span></Link>
                 <SignedIn>
                     <Link to={"/"} className={cn(buttonVariants(
                     {
@@ -36,6 +38,7 @@ const LeftSideBar = () => {
                 <MessageCircle  className='mr-2 size-5'/><span className='hidden md:block'>Message</span></Link>
                 </SignedIn>
             </div>
+            <div className='mt-3 space-y-1 border-t border-white/10 pt-3 hidden md:block'><Link to="/liked" className='flex items-center gap-3 rounded-md px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white'><Heart className='size-4'/>Liked Songs</Link><Link to="/recently-played" className='flex items-center gap-3 rounded-md px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white'><Clock3 className='size-4'/>Recently Played</Link></div>
         </div>
 
         {/* Library */}

@@ -69,7 +69,7 @@ const PlayBackControl = () => {
   const hasSong = Boolean(currentSong);
 
   return (
-    <footer className="h-20 shrink-0 border-t border-white/10 bg-zinc-950 px-3 sm:h-24 sm:px-4">
+    <footer className="mb-16 h-20 shrink-0 border-t border-white/10 bg-zinc-950 px-3 sm:h-24 sm:px-4 md:mb-0">
       <div className="mx-auto grid h-full max-w-[1800px] grid-cols-[minmax(180px,1fr)_minmax(280px,560px)_minmax(180px,1fr)] items-center gap-4 sm:gap-6">
         <div className="hidden min-w-0 items-center gap-3 sm:flex">
           {currentSong ? (

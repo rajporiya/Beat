@@ -5,6 +5,7 @@ import FreiendActivity from './componants/FreiendActivity';
 import AudioPlayer from './AudioPlayer';
 import PlayBackControl from './componants/PlayBackControl';
 import { useEffect, useState } from 'react';
+import MobileNav from './componants/MobileNav';
 
 const MainLayout = () => {
   const [isMobile, setIsMobile] = useState(false)
@@ -19,7 +20,7 @@ const MainLayout = () => {
   }, [])
   return (
     <div className='h-screen bg-black text-white flex flex-col selection:bg-[#1ed760] selection:text-black'>
-      <ResizablePanelGroup orientation='horizontal' className='h-full flex flex-1 overflow-hidden gap-2 p-2'>
+      <ResizablePanelGroup orientation='horizontal' className='h-full flex flex-1 overflow-hidden gap-2 p-2 md:pb-2'>
         <AudioPlayer />
 
         <ResizablePanel defaultSize={200}  minSize={isMobile ? 0 : 10} maxSize={300}>
@@ -48,6 +49,7 @@ const MainLayout = () => {
         )}
       </ResizablePanelGroup>
       <PlayBackControl />
+      <MobileNav />
     </div>
   )
 }

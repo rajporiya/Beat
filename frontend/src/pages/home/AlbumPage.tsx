@@ -15,7 +15,7 @@ export const formateDuration = (second : number) => {
 const AlbumPage = () => {
   const { albumId } = useParams<{ albumId: string }>();
   const { fetchAlbumId, curruntAlbum, isLoading, err } = useMusicStore();
-  const  { currentSong, isPlaying,playerAlbum, togglePlay}= usePlayStore()
+  const  { currentSong, isPlaying,playerAlbum, togglePlay, setCurrentSong}= usePlayStore()
 
   useEffect(() => {
     if (albumId) fetchAlbumId(albumId);
@@ -43,7 +43,7 @@ const AlbumPage = () => {
   }
 const handlePlayAlbums = ()=>{
   if(!curruntAlbum) return
-  const isCurrentAlbumPlaying = curruntAlbum?.songs.some(song => song._id === curruntAlbum?._id)
+  const isCurrentAlbumPlaying = curruntAlbum.songs.some(song => song._id === currentSong?._id)
   if(isCurrentAlbumPlaying) togglePlay()
     else {
       playerAlbum(curruntAlbum?.songs, 0)
@@ -111,6 +111,7 @@ const handlePlayAlbums = ()=>{
                   return (
                   <div 
                     key={song._id}
+                    onClick={() => setCurrentSong(song)}
                     className={`grid grid-cols-[16px_4fr_2fr_1fr] gap-4 px-4 py-2 text-sm text-zinc-400 hover:bg-white/5 rounded-md group cursor-pointer`}
                   >
                     <div className="flex items-center justify-center">
