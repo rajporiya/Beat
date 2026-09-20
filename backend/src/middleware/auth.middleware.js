@@ -25,14 +25,12 @@ export const requireAdmin = async (req, res, next ) => {
             return res.status(401).json({ message: "unauthorized - You" });
         }
         const currentUser = await clerkClient.users.getUser(userId);
-        const userEmail = currentUser.emailAddresses.find(e => e.id === currentUser.primaryEmailAddressId)?.emailAddress;
-        const isAdmin = process.env.ADMIN_EMAIL?.trim().toLowerCase() === userEmail?.trim().toLowerCase();
-
-        console.log("Admin Check:", {
-            configuredAdminEmail: process.env.ADMIN_EMAIL,
-            loggedInUserEmail: userEmail,
-            isAdminMatch: isAdmin
-        });
+        const userEmail = currentUser.emailAddresses.find(e => e.id === currentUser.primaryEmailAddressId)?.emailAddress?.trim().toLowerCase();
+        const configuredEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "")
+            .split(",")
+            .map((email) => email.trim().toLowerCase())
+            .filter(Boolean);
+        const isAdmin = currentUser.publicMetadata?.role === "admin" || configuredEmails.includes(userEmail);
 
         if(!isAdmin){
             return res.status(403).json({message : "Unauthorized - you must be an admin"})

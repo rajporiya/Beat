@@ -5,6 +5,7 @@ import FeaturedSection from "./home/componants/FeaturedSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SectionGrid from "./home/componants/SectionGrid";
 import { usePlayStore } from "@/stores/usePlayerStore";
+import PopularArtists from "./home/componants/PopularArtists";
 
 const HomePage = () => {
   const {  featureSong, fetchFeatureSong, fetchMadeForYouSong, fetchTrendingSong, isLoading, madeForYouSongs, trendingSong } = useMusicStore()
@@ -29,8 +30,9 @@ const HomePage = () => {
       <ScrollArea className="h-[calc(100vh-180px)]">
         <div className="space-y-10 p-5 sm:p-7">
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{greeting}</h1>
-          <SectionGrid  title="Made for you" songs={madeForYouSongs} isLoading={isLoading}/>
-          <SectionGrid  title="Trending" songs={trendingSong} isLoading={isLoading}/>
+          <SectionGrid title="Trending songs" songs={trendingSong} isLoading={isLoading}/>
+          <PopularArtists />
+          <SectionGrid title="Popular albums and singles" songs={madeForYouSongs} isLoading={isLoading}/>
         </div>
       </ScrollArea>
     </main>

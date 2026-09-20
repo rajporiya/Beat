@@ -51,7 +51,17 @@ const LeftSideBar = () => {
                 <div className='hidden md:flex items-center gap-1 text-zinc-400'><Plus className='size-5 hover:text-white cursor-pointer' /><Search className='size-4 hover:text-white cursor-pointer' /></div>
             </div>
             <ScrollArea className='flex-1'>
-                <div className='space-y-2'>
+                <div className='space-y-3'>
+                    <section className='hidden md:block rounded-lg bg-[#242424] p-4'>
+                        <h3 className='font-bold'>Create your first playlist</h3>
+                        <p className='mt-2 text-sm text-zinc-300'>It&apos;s easy, we&apos;ll help you.</p>
+                        <button className='mt-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-black hover:scale-[1.02]'>Create playlist</button>
+                    </section>
+                    <section className='hidden md:block rounded-lg bg-[#242424] p-4'>
+                        <h3 className='font-bold'>Let&apos;s find some podcasts to follow</h3>
+                        <p className='mt-2 text-sm text-zinc-300'>We&apos;ll keep you updated on new episodes.</p>
+                        <button className='mt-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-black hover:scale-[1.02]'>Browse podcasts</button>
+                    </section>
                     {isLoading ?(
                         <PlaylistSkeleton />
                     ) : (
@@ -65,6 +75,7 @@ const LeftSideBar = () => {
                         </Link>
                         ))
                     )}
+                    <footer className='hidden md:flex flex-wrap gap-x-4 gap-y-2 px-1 pt-8 text-[11px] text-zinc-400'><span>Legal</span><span>Safety &amp; Privacy Center</span><span>Privacy Policy</span><span>Cookies</span><span>About Ads</span><span>Accessibility</span></footer>
                 </div>
             </ScrollArea>
         </div>
