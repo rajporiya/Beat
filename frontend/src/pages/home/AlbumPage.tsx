@@ -62,11 +62,18 @@ const handlePlayAlbums = ()=>{
 
           <div className="relative z-10">
             <div className="flex flex-col gap-5 p-6 pb-8 sm:flex-row sm:items-end">
-              <img
-                src={curruntAlbum.imageUrl}
-                alt={curruntAlbum.title}
-                className="size-48 rounded shadow-xl object-cover sm:size-60"
-              />
+              {curruntAlbum.imageUrl ? (
+                <img
+                  src={curruntAlbum.imageUrl}
+                  onError={(event) => { event.currentTarget.src = `https://placehold.co/600x600/27272a/f5d0fe?text=${encodeURIComponent(curruntAlbum.title)}` }}
+                  alt={curruntAlbum.title}
+                  className="size-48 rounded shadow-xl object-cover sm:size-60"
+                />
+              ) : (
+                <div className="grid size-48 place-items-center rounded bg-[#242424] shadow-xl sm:size-60">
+                  <span className="text-6xl">🎵</span>
+                </div>
+              )}
               <div>
                 <p className="text-sm font-medium">Album</p>
                 <h1 className="my-4 text-4xl font-bold sm:text-6xl">

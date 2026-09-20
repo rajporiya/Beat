@@ -1,10 +1,25 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useMusicStore } from "@/stores/useMusicStore";
-import { MoreHorizontal } from "lucide-react";
+import { axiosInstance } from "@/lib/axios";
+import { Loader2, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 const SongsTable = () => {
-  const { songs, isLoading, err } = useMusicStore();
+  const { songs, isLoading, err, fetchSongs, fetchAlbums, fetchStats } = useMusicStore();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const songList = Array.isArray(songs) ? songs : [];
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await axiosInstance.delete(`/admin/songs/${id}`);
+      await Promise.all([fetchSongs(), fetchAlbums(), fetchStats()]);
+    } catch (error) {
+      console.error("Failed to delete song:", error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -42,9 +57,16 @@ const SongsTable = () => {
             </TableCell>
             <TableCell className="font-medium text-white">{song.title}</TableCell>
             <TableCell className="text-zinc-400">{song.artist || "Unknown Artist"}</TableCell>
-            <TableCell className="hidden md:table-cell text-zinc-400">{new Date(song.createdAt).toLocaleDateString()}</TableCell>
+            <TableCell className="hidden md:table-cell text-zinc-400">{song.createdAt ? new Date(song.createdAt).toLocaleDateString() : "-"}</TableCell>
             <TableCell className="text-right">
-              <button aria-label={`Actions for ${song.title}`} className="grid size-8 place-items-center rounded-full text-zinc-400 hover:bg-white/10 hover:text-white"><MoreHorizontal className="size-5" /></button>
+              <button
+                aria-label={`Delete ${song.title}`}
+                onClick={() => handleDelete(song._id)}
+                className="grid size-8 place-items-center rounded-full text-zinc-400 hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+                disabled={deletingId === song._id}
+              >
+                {deletingId === song._id ? <Loader2 className="size-5 animate-spin" /> : <Trash2 className="size-5" />}
+              </button>
             </TableCell>
           </TableRow>
         ))}

@@ -17,22 +17,23 @@ const uploadToCloudinary = async (file) =>{
 
 export const createSong = async (req,res, next) => {
    try {
-    if (!req.files || !req.files.audioFile || !req.file.imageFile){
+    if (!req.files || !req.files.audioFile || !req.files.imageFile){
         return res.status(400).json({
-            message : " plz upload all files"
+            message : "Please upload both an audio file and an image file"
         })
     }
-    const   { title, artist, albumId, duration}= req.body
-    const audioFile = req.files.audioFile
-    const imageFile = req.files.imageFile
-    const audioUrl = await uploadToCloudinary(audioFile)
-    const imageURL = await uploadToCloudinary(audioFile)
+    const { title, artist, albumId, duration }= req.body
+    if(!title || !artist){
+        return res.status(400).json({message : "Title and artist are required"})
+    }
+    const audioUrl = await uploadToCloudinary(req.files.audioFile)
+    const imageUrl = await uploadToCloudinary(req.files.imageFile)
     const song = new Song({
         title,
         artist,
-        imageURL, 
+        imageUrl,
         audioUrl,
-        duration,
+        duration: Number(duration) || 0,
         albumId: albumId || null
     })
 
@@ -44,9 +45,8 @@ export const createSong = async (req,res, next) => {
     }
     res.status(201).json(song)
    } catch (error) {
-    console.log("errpr createSong", error);
-    res.status(500).json({message: "internal server error create song", error})
-    next(error)
+    console.log("error createSong", error.message);
+    res.status(500).json({message: "Failed to create song", error: error?.message})
    }
 }
 
@@ -55,9 +55,12 @@ export const deleteSong = async (req,res, next) => {
         const { id } = req.params
 
         const song = await Song.findById(id)
+        if(!song){
+            return res.status(404).json({message : "Song not found"})
+        }
 
         // if  song from album
-        if(song.albymId){
+        if(song.albumId){
             await Album.findByIdAndUpdate(song.albumId, {
                 $pull : { songs : song._id},
             })
@@ -65,7 +68,7 @@ export const deleteSong = async (req,res, next) => {
         await Song.findByIdAndDelete(id)
         res.status(200).json({message : "Song deleted successfully"})
     } catch (error) {
-        console.log("errro from deleter song", error);
+        console.log("error from delete song", error);
         
         next(error)
     }
@@ -73,33 +76,38 @@ export const deleteSong = async (req,res, next) => {
 
 export const createAlbum  = async (req,res, next) => {
     try {
-        const { title, artist, releaseYear}= req.body 
-        const { imageFile} =req.files
-        const imageUrl = await uploadToCloudinary(imageFile)
-
+        const { title, artist, releaseYear }= req.body 
+        if(!title || !artist){
+            return res.status(400).json({message : "Title and artist are required"})
+        }
+        let imageUrl = ""
+        if (req.files?.imageFile){
+            imageUrl = await uploadToCloudinary(req.files.imageFile)
+        }
         const album = new Album({
             title,
-             artist,
-             imageUrl,
-             releaseYear
+            artist,
+            imageUrl,
+            releaseYear: Number(releaseYear) || new Date().getFullYear()
         })
 
         await album.save()
+        res.status(201).json(album)
     } catch (error) {
-        console.log("errro from create album", error);
-        next(error)
+        console.log("error from create album", error.message);
+        res.status(500).json({message: "Failed to create album", error: error?.message})
     }
 }
 
 export const deleteAlbum = async (req,res, next) => {
     try {
-        const { id } = req.body
+        const { id } = req.params
         await Song.deleteMany({ albumId : id})
         await Album.findByIdAndDelete(id)
 
         res.status(200).json({message : "Album deleted successfully"})
     } catch (error) {
-        console.log("errro from album song", error);
+        console.log("error from album song", error.message);
         next(error);
     }
 }

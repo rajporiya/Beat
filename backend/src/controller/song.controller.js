@@ -5,7 +5,8 @@ export const getAllSongs = async (req,res,next)=>{
         // -1 descending => newser -> oldest
         // 1 descending =>  oldest ->newser 
         const songs = await Song.find().sort({createdAt : -1})
+        res.status(200).json(songs)
     } catch (error) {
-        
+        next(error)
     }
 }

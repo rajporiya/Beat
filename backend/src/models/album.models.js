@@ -11,11 +11,16 @@ const albumSchema = new mongoose.Schema({
     },
     imageUrl :{
         type :String, 
-        required : true,
+        default: "",
     },
     releaseYear :{
         type: Number,
-        required: true,
+        default: () => new Date().getFullYear(),
+    },
+    owner :{
+        type :String,
+        default : null,
+        index : true,
     },
     songs:[
         {

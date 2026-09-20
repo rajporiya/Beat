@@ -4,7 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
 import { useMusicStore } from '@/stores/useMusicStore'
 import { SignedIn } from '@clerk/clerk-react'
-import { Clock3, Heart, HomeIcon, Library, MessageCircle, Plus, Search } from 'lucide-react'
+import { Clock3, Disc3, Heart, HomeIcon, Library, MessageCircle, Plus, Search } from 'lucide-react'
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -67,7 +67,18 @@ const LeftSideBar = () => {
                     ) : (
                         albums.map((album: any) => (
                         <Link to={`/album/${album._id}`} key={album._id} className='p-2 hover:bg-zinc-800 rounded-md flex items-center gap-3 group cursor-pointer'>
-                        <img src={album.imageUrl}  alt=""  className='size-12 rounded-md flex shrink-0 object-cover'/>
+                        {album.imageUrl ? (
+                        <img
+                          src={album.imageUrl}
+                          onError={(event) => { event.currentTarget.src = `https://placehold.co/600x600/27272a/f5d0fe?text=${encodeURIComponent(album.title)}` }}
+                          alt=""
+                          className='size-12 rounded-md flex shrink-0 object-cover'
+                        />
+                      ) : (
+                        <div className='grid size-12 shrink-0 place-items-center rounded-md bg-[#242424]'>
+                          <Disc3 className='size-5 text-zinc-500' />
+                        </div>
+                      )}
                         <div className='flex-1 min-w-0 hidden md:block'>
                             <p className='font-medium truncate'>{album.title}</p>
                             <p className='text-sm text-zinc-400 truncate'>Album • {album.artist}</p>
