@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import type { ElementType } from 'react'
 
 interface StatsCardProps {
@@ -7,11 +8,20 @@ interface StatsCardProps {
   bgColor: string
   value: string
   iconColor: string
+  active?: boolean
+  onClick?: () => void
 }
 
-const StatsCard = ({ icon: Icon, label, bgColor, value, iconColor }: StatsCardProps) => {
+const StatsCard = ({ icon: Icon, label, bgColor, value, iconColor, active = false, onClick }: StatsCardProps) => {
   return (
-    <Card className='border-0 bg-[#181818] text-white hover:bg-[#242424] transition-colors'>
+    <Card
+      onClick={onClick}
+      className={cn(
+        'border-0 bg-[#181818] text-white transition-colors',
+        onClick && 'cursor-pointer hover:bg-[#242424]',
+        active && 'ring-2 ring-[#1ed760]'
+      )}
+    >
       <CardContent className='flex items-center gap-4 p-5' >
         <div className={`p-3 rounded-full ${bgColor}`}><Icon className={`size-5 ${iconColor}`}/></div>
         <div className='min-w-0'>

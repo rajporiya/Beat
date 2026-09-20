@@ -1,11 +1,12 @@
 import { axiosInstance } from "@/lib/axios";
-import type { Album, Song, Stats } from "@/types";
+import type { Album, Song, Stats, User } from "@/types";
 import { create } from "zustand";
 
 interface MusicStore {
     songs : Song[],
     albums : Album[]
     artists : string[]
+    users : User[]
     isLoading: boolean;
     err: string | null;
     curruntAlbum : Album | null;
@@ -18,6 +19,7 @@ interface MusicStore {
     fetchSongs :  () => Promise<void>
     fetchStats : () =>  Promise<void>
     fetchArtists : () =>  Promise<void>
+    fetchUsers : () =>  Promise<void>
 
 
     madeForYouSongs : Song[];
@@ -32,6 +34,7 @@ export const useMusicStore = create<MusicStore>((set)=>({
     albums : [],
     songs : [],
     artists : [],
+    users : [],
     isLoading : false,
     err : null,
     curruntAlbum : null,
@@ -144,6 +147,14 @@ fetchStats : async ()=>{
             set({ artists : responce.data })
         } catch (error : any) {
             console.error("Failed to fetch artists:", error.response?.data?.message ?? error.message)
+        }
+    },
+    fetchUsers : async ()=>{
+        try {
+            const responce  = await axiosInstance.get("/admin/users")
+            set({ users : responce.data })
+        } catch (error : any) {
+            console.error("Failed to fetch users:", error.response?.data?.message ?? error.message)
         }
     }
 }))

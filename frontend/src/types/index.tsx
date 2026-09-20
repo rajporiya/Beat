@@ -24,3 +24,12 @@ export interface Stats{
     totalUsers : number,
     totalArtists : number,
 }
+export interface User{
+    _id : string,
+    fullName: string,
+    imageUrl : string,
+    email : string,
+    clerkId : string,
+    role : string,
+    createdAt : string,
+}

@@ -1,5 +1,6 @@
 import {Song} from '../models/song.models.js'
 import { Album } from '../models/album.models.js'
+import { User } from '../models/user.models.js'
 import cloudinary from '../lib/cludinary.js'
 
 const uploadToCloudinary = async (file) =>{
@@ -209,6 +210,16 @@ export const getArtists = async (req,res, next) => {
         res.status(200).json(artists.map((item) => item._id))
     } catch (error) {
         console.log("error from get artists", error.message);
+        next(error)
+    }
+}
+
+export const getUsers = async (req,res, next) => {
+    try {
+        const users = await User.find().select("-password").sort({ createdAt: -1 })
+        res.status(200).json(users)
+    } catch (error) {
+        console.log("error from get users", error.message);
         next(error)
     }
 }
