@@ -2,7 +2,6 @@ import { Button } from '@/components/ui/button'
 import { usePlayStore } from '@/stores/usePlayerStore'
 import type { Song } from '@/types'
 import { Pause, Play } from 'lucide-react'
-import React from 'react'
 
 const PlayButton = ({song} : { song : Song}) => {
     const { currentSong, isPlaying, setCurrentSong , togglePlay} = usePlayStore()
@@ -12,7 +11,7 @@ const PlayButton = ({song} : { song : Song}) => {
             else setCurrentSong(song)
     }
   return (
-    <Button size={'icon'} onClick={handlePlay} className={`absolute bottom-3 right-2 bg-green-500 hover:bg-green-400 hover:scale-105 transition-all
+    <Button size={'icon'} aria-label={`Play ${song.title}`} onClick={handlePlay} className={`absolute bottom-3 right-2 rounded-full bg-[#1ed760] hover:bg-[#3be477] hover:scale-105 transition-all shadow-xl
   opacity-0 translate-y-2 group-hover:translate-y-0 ${
     isCurrentSong ? "opacity-100" : "opacity-0 group-hover:opacity-100"
   }`}>

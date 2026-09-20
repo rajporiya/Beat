@@ -11,15 +11,10 @@ interface StatsCardProps {
 
 const StatsCard = ({ icon: Icon, label, bgColor, value, iconColor }: StatsCardProps) => {
   return (
-    <Card className='bg-zinc-800/50 border-zinc-700/50 hover:bg-zinc-800/80 transition-colors space-x-4'>
-      <CardContent className='flex ' >
-        <div className='flex items-center gap-4'>
-            <div className={`p-3 rounded-lg ${bgColor}`}>
-                <Icon  className={`size-6 ${iconColor}`}/>
-            </div>
-        </div>
-
-        <div>
+    <Card className='border-0 bg-[#181818] text-white hover:bg-[#242424] transition-colors'>
+      <CardContent className='flex items-center gap-4 p-5' >
+        <div className={`p-3 rounded-full ${bgColor}`}><Icon className={`size-5 ${iconColor}`}/></div>
+        <div className='min-w-0'>
             <p className='text-sm text-zinc-400'>{label}</p>
             <p className='text-2xl font-bold'>{value}</p>
         </div>

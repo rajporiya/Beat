@@ -21,12 +21,12 @@ const HomePage = () => {
     }
   },[initalizeQueue,featureSong,madeForYouSongs,trendingSong])
   return (
-    <main className="rounded-md overflow-hidden h-full ">
+    <main className="rounded-md overflow-hidden h-full bg-gradient-to-b from-[#242424] via-[#121212] to-[#121212]">
       <Topbar />
       <FeaturedSection />
       <ScrollArea className="h-[calc(100vh-180px)]">
-        <div className="space-y-10 p-4">
-          <h1 className="text-2xl font-bold">Good Afternoon</h1>
+        <div className="space-y-10 p-5 sm:p-7">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Good afternoon</h1>
           <SectionGrid  title="Made for you" songs={madeForYouSongs} isLoading={isLoading}/>
           <SectionGrid  title="Trending" songs={trendingSong} isLoading={isLoading}/>
         </div>

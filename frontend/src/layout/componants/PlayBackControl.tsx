@@ -89,7 +89,7 @@ const PlayBackControl = () => {
           <div className="flex h-8 items-center justify-center gap-2 sm:gap-3">
             <Button title="Shuffle" aria-label="Shuffle" size="icon" variant="ghost" className={`${iconButtonClass} hidden sm:inline-flex`} disabled={!hasSong}><Shuffle className="size-4" /></Button>
             <Button title="Previous" aria-label="Previous track" size="icon" variant="ghost" className={iconButtonClass} onClick={playPrevious} disabled={!hasSong}><SkipBack className="size-4" fill="currentColor" /></Button>
-            <Button title={isPlaying ? "Pause" : "Play"} aria-label={isPlaying ? "Pause" : "Play"} size="icon" className="size-8 rounded-full bg-white text-black hover:scale-105 hover:bg-white disabled:bg-zinc-700 disabled:text-zinc-400" onClick={togglePlay} disabled={!hasSong}>
+            <Button title={isPlaying ? "Pause" : "Play"} aria-label={isPlaying ? "Pause" : "Play"} size="icon" className="size-8 rounded-full bg-[#1ed760] text-black hover:scale-105 hover:bg-[#3be477] disabled:bg-zinc-700 disabled:text-zinc-400" onClick={togglePlay} disabled={!hasSong}>
               {isPlaying ? <Pause className="size-4" fill="currentColor" /> : <Play className="ml-0.5 size-4" fill="currentColor" />}
             </Button>
             <Button title="Next" aria-label="Next track" size="icon" variant="ghost" className={iconButtonClass} onClick={playNext} disabled={!hasSong}><SkipForward className="size-4" fill="currentColor" /></Button>

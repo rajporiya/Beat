@@ -12,12 +12,14 @@ const MainLayout = () => {
   useEffect(()=>{
     const checkMobile = () =>{
       setIsMobile(window.innerWidth < 768)
-      return () => window.removeEventListener("resize", checkMobile)
     }
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
   }, [])
   return (
-    <div className='h-screen bg-black text-white flex flex-col'>
-      <ResizablePanelGroup orientation='horizontal' className='h-full flex flex-1 overflow-hidden p-2'>
+    <div className='h-screen bg-black text-white flex flex-col selection:bg-[#1ed760] selection:text-black'>
+      <ResizablePanelGroup orientation='horizontal' className='h-full flex flex-1 overflow-hidden gap-2 p-2'>
         <AudioPlayer />
 
         <ResizablePanel defaultSize={200}  minSize={isMobile ? 0 : 10} maxSize={300}>
@@ -26,17 +28,17 @@ const MainLayout = () => {
         </ResizablePanel>
         {/* Main content */}
 
-        <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
+        <ResizableHandle className="w-1 bg-black rounded-lg transition-colors" />
 
         <ResizablePanel defaultSize={isMobile ? 80 : 60}>
-          <div className='h-full bg-zinc-900 rounded-lg overflow-hidden'>
+          <div className='h-full bg-[#121212] rounded-lg overflow-hidden'>
             <Outlet />
           </div>
         </ResizablePanel>
 
         {!isMobile && (
           <>
-          <ResizableHandle className="w-2 bg-black rounded-lg transition-colors" />
+          <ResizableHandle className="w-1 bg-black rounded-lg transition-colors" />
 
         {/* right */}
         <ResizablePanel defaultSize={20} minSize={0} maxSize={250} collapsedSize={0}>

@@ -1,5 +1,5 @@
 import { useAuthStro } from '@/stores/useAuthStro'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import HeaderAdimn from './componants/HeaderAdimn'
 import DashboardStats from './DashboardStats'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -19,16 +19,17 @@ const AdminPage = () => {
   if(!isAdmin && !isLoading) return <div>Unauthorized</div>
 
   return (
-    <div className='min-h-screen bg-gradient-to-b from-zinc-900 via-zinc-900 to-black text-zinc-900 p-8'>
+    <div className='min-h-screen bg-[#0b0b0b] text-white'>
+      <div className='mx-auto max-w-7xl p-5 sm:p-8'>
       <HeaderAdimn />
       <DashboardStats />
 
       <Tabs defaultValue='songs' className='space-y-6 '>
-        <TabsList className='p-1 bg-zinc-800/50'> 
-          <TabsTrigger value='songs' className='flex  data-[state=active]:bg-zinc-700'>
+        <TabsList className='h-11 p-1 bg-[#242424] rounded-full'>
+          <TabsTrigger value='songs' className='rounded-full px-5 flex text-zinc-300 data-[state=active]:bg-white data-[state=active]:text-black'>
             <Music  className='mr-2 size-4 ' />Songs
           </TabsTrigger>
-          <TabsTrigger value='albums' className='flex  data-[state=active]:bg-zinc-700'>
+          <TabsTrigger value='albums' className='rounded-full px-5 flex text-zinc-300 data-[state=active]:bg-white data-[state=active]:text-black'>
             <Album  className='mr-2 size-4 ' />Albums
           </TabsTrigger>
         </TabsList>
@@ -39,6 +40,7 @@ const AdminPage = () => {
           <AlbumsTabContent />
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   )
 }
