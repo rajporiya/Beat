@@ -6,10 +6,11 @@ import { Clock, Pause, Play } from "lucide-react";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-export const formateDuration = (second : number) => {
+  export const formateDuration = (second: number) => {
+  if (!Number.isFinite(second) || second < 0) second = 0;
   const minute = Math.floor(second / 60)
-  const remaingSecond = second % 60;
-  return `${minute} : ${remaingSecond.toString().padStart(2,"0")}`
+  const remaingSecond = Math.floor(second % 60);
+  return `${minute.toString().padStart(2, "0")}:${remaingSecond.toString().padStart(2, "0")}`
 }
 
 const AlbumPage = () => {

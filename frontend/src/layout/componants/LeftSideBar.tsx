@@ -5,17 +5,21 @@ import { cn } from '@/lib/utils'
 import { useMusicStore } from '@/stores/useMusicStore'
 import { SignedIn } from '@clerk/clerk-react'
 import { Clock3, Disc3, Heart, HomeIcon, Library, MessageCircle, Plus, Search } from 'lucide-react'
-import { useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import CreateUserAlbumModal from '@/components/CreateUserAlbumModal'
 
 const LeftSideBar = () => {
     const { albums, fetchAlbums, isLoading} = useMusicStore();
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const navigate = useNavigate();
     // const isLoading = false;
     useEffect(()=>{
         fetchAlbums()
     }, [fetchAlbums])
-  return (
-    <div className='h-full flex flex-col gap-2'>
+return (
+    <>
+    <div className='h-full flex flex-col gap-2 min-h-0'>
         {/* navigation */}
         <div className='rounded-lg bg-[#121212] p-3'>
             <div className='space-y-2'>
@@ -42,7 +46,7 @@ const LeftSideBar = () => {
         </div>
 
         {/* Library */}
-        <div className='rounded-lg bg-[#121212] p-3 flex-1 flex flex-col overflow-hidden'>
+        <div className='rounded-lg bg-[#121212] p-3 flex-1 flex flex-col overflow-hidden min-h-0'>
             <div className='flex items-center justify-between mb-4'>
                 <div className='flex items-center text-white px-2'>
                     <Library className='size-5 mr-2'/> 
@@ -50,17 +54,17 @@ const LeftSideBar = () => {
                 </div>
                 <div className='hidden md:flex items-center gap-1 text-zinc-400'><Plus className='size-5 hover:text-white cursor-pointer' /><Search className='size-4 hover:text-white cursor-pointer' /></div>
             </div>
-            <ScrollArea className='flex-1'>
+            <ScrollArea className='flex-1 min-h-0'>
                 <div className='space-y-3'>
                     <section className='hidden md:block rounded-lg bg-[#242424] p-4'>
                         <h3 className='font-bold'>Create your first playlist</h3>
                         <p className='mt-2 text-sm text-zinc-300'>It&apos;s easy, we&apos;ll help you.</p>
-                        <button className='mt-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-black hover:scale-[1.02]'>Create playlist</button>
+                        <button onClick={() => setIsCreateModalOpen(true)} className='mt-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-black hover:scale-[1.02]'>Create playlist</button>
                     </section>
                     <section className='hidden md:block rounded-lg bg-[#242424] p-4'>
                         <h3 className='font-bold'>Let&apos;s find some podcasts to follow</h3>
                         <p className='mt-2 text-sm text-zinc-300'>We&apos;ll keep you updated on new episodes.</p>
-                        <button className='mt-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-black hover:scale-[1.02]'>Browse podcasts</button>
+                        <button onClick={() => navigate('/library')} className='mt-5 rounded-full bg-white px-4 py-2 text-sm font-bold text-black hover:scale-[1.02]'>Browse podcasts</button>
                     </section>
                     {isLoading ?(
                         <PlaylistSkeleton />
@@ -91,6 +95,8 @@ const LeftSideBar = () => {
             </ScrollArea>
         </div>
     </div>
+    <CreateUserAlbumModal open={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+    </>
   )
 }
 

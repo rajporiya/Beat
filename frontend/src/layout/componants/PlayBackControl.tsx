@@ -14,7 +14,7 @@ import {
   SkipForward,
   Volume1,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const iconButtonClass =
   "size-8 text-zinc-400 hover:bg-transparent hover:text-white disabled:opacity-35";
@@ -25,6 +25,7 @@ const PlayBackControl = () => {
   const [volume, setVolume] = useState(75);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const durationSongRef = useRef<string | null>(null);
 
   useEffect(() => {
     const audio = document.querySelector("audio");
@@ -38,16 +39,27 @@ const PlayBackControl = () => {
       setDuration(0);
     };
 
+    const songId = currentSong?._id ?? null;
+    const songChanged = durationSongRef.current !== songId;
+
     audio.volume = volume / 100;
     audio.addEventListener("timeupdate", updateTime);
     audio.addEventListener("loadedmetadata", updateDuration);
     audio.addEventListener("durationchange", updateDuration);
+    audio.addEventListener("playing", updateDuration);
     audio.addEventListener("emptied", resetTime);
+
+    if (songChanged) {
+      durationSongRef.current = songId;
+      setCurrentTime(0);
+      setDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
+    }
 
     return () => {
       audio.removeEventListener("timeupdate", updateTime);
       audio.removeEventListener("loadedmetadata", updateDuration);
       audio.removeEventListener("durationchange", updateDuration);
+      audio.removeEventListener("playing", updateDuration);
       audio.removeEventListener("emptied", resetTime);
     };
   }, [currentSong, volume]);
@@ -106,9 +118,9 @@ const PlayBackControl = () => {
           </div>
 
           <div className="flex w-full items-center gap-2 text-[11px] tabular-nums text-zinc-400">
-            <span className="w-9 text-right">{formateDuration(currentTime)}</span>
+            <span className="w-12 text-right">{formateDuration(currentTime)}</span>
             <Slider aria-label="Playback progress" value={[Math.min(currentTime, duration || 0)]} max={duration || 1} step={1} className="[&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-track]]:bg-zinc-700 [&_[data-slot=slider-range]]:bg-zinc-300 [&_[data-slot=slider-thumb]]:size-3 [&_[data-slot=slider-thumb]]:border-0 [&_[data-slot=slider-thumb]]:opacity-0 hover:[&_[data-slot=slider-thumb]]:opacity-100" onValueChange={handleSeek} disabled={!hasSong || !duration} />
-            <span className="w-9">{formateDuration(duration)}</span>
+            <span className="w-12">{formateDuration(duration)}</span>
           </div>
         </div>
 
