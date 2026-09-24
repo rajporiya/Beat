@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Topbar } from "@/components/c/Topbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMusicStore } from "@/stores/useMusicStore";
@@ -21,7 +21,7 @@ const HomePage = () => {
     trendingSong,
   } = useMusicStore();
 
-  const { initalizeQueue } = usePlayStore();
+  const { initalizeQueue, queue } = usePlayStore();
 
   useEffect(() => {
     fetchFeatureSong();
@@ -30,29 +30,32 @@ const HomePage = () => {
   }, [fetchFeatureSong, fetchMadeForYouSong, fetchTrendingSong]);
 
   // Combine fetched songs with our high-definition showcase items (prioritizing showcase to match photo)
-  const displayTrendingSongs =
-    trendingSong.length > 0
-      ? [
-          ...SPOTIFY_TRENDING_SONGS,
-          ...trendingSong.filter(
-            (s) => !SPOTIFY_TRENDING_SONGS.some((st) => st.title.toLowerCase() === s.title.toLowerCase())
-          ),
-        ]
-      : SPOTIFY_TRENDING_SONGS;
+  const displayTrendingSongs = useMemo(() => {
+    if (!trendingSong || trendingSong.length === 0) return SPOTIFY_TRENDING_SONGS;
+    return [
+      ...SPOTIFY_TRENDING_SONGS,
+      ...trendingSong.filter(
+        (s) => !SPOTIFY_TRENDING_SONGS.some((st) => st.title.toLowerCase() === s.title.toLowerCase())
+      ),
+    ];
+  }, [trendingSong]);
 
-  const displayAlbums =
-    madeForYouSongs.length > 0
-      ? [
-          ...SPOTIFY_POPULAR_ALBUMS,
-          ...madeForYouSongs.filter(
-            (s) => !SPOTIFY_POPULAR_ALBUMS.some((sa) => sa.title.toLowerCase() === s.title.toLowerCase())
-          ),
-        ]
-      : SPOTIFY_POPULAR_ALBUMS;
+  const displayAlbums = useMemo(() => {
+    if (!madeForYouSongs || madeForYouSongs.length === 0) return SPOTIFY_POPULAR_ALBUMS;
+    return [
+      ...SPOTIFY_POPULAR_ALBUMS,
+      ...madeForYouSongs.filter(
+        (s) => !SPOTIFY_POPULAR_ALBUMS.some((sa) => sa.title.toLowerCase() === s.title.toLowerCase())
+      ),
+    ];
+  }, [madeForYouSongs]);
 
   useEffect(() => {
-    initalizeQueue([...displayTrendingSongs, ...displayAlbums]);
-  }, [initalizeQueue, displayTrendingSongs, displayAlbums]);
+    const totalCount = displayTrendingSongs.length + displayAlbums.length;
+    if (queue.length !== totalCount) {
+      initalizeQueue([...displayTrendingSongs, ...displayAlbums]);
+    }
+  }, [initalizeQueue, queue.length, displayTrendingSongs, displayAlbums]);
 
   return (
     <main className="flex h-full flex-col overflow-hidden bg-[#121212]">

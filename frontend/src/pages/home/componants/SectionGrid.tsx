@@ -12,7 +12,7 @@ type SectionGridProps = {
 };
 
 const SectionGrid = ({ title, songs, isLoading, onShowAll }: SectionGridProps) => {
-  const { currentSong, setCurrentSong, togglePlay, isPlaying } = usePlayStore();
+  const { currentSong, setCurrentSong, togglePlay } = usePlayStore();
 
   if (isLoading) return <SectionGridSkeleton />;
   if (!songs || !songs.length) return null;
