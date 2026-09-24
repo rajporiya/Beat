@@ -5,9 +5,15 @@ export interface ArtistDetail {
   avatarUrl: string;
 }
 
+export interface CreditItem {
+  name: string;
+  role: string;
+}
+
 export interface SongDetails {
   lyrics: string[];
   artistDetail: ArtistDetail;
+  credits: CreditItem[];
 }
 
 export const ARTIST_DETAILS: Record<string, ArtistDetail> = {
@@ -198,5 +204,27 @@ export const getLyricsForSong = (title: string = ""): string[] => {
     "Meri zameen ban gaye",
     "Kyunki main tera ban jaunga",
     "Main tera ban jaunga...",
+  ];
+};
+
+export const getCreditsForSong = (
+  _title: string = "",
+  artist: string = ""
+): CreditItem[] => {
+  const parts = artist
+    .split(/[,&]/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (parts.length > 0) {
+    return parts.map((name, i) => ({
+      name,
+      role: i === 0 ? "Main Artist, Composer" : "Main Artist",
+    }));
+  }
+
+  return [
+    { name: "Pritam", role: "Main Artist" },
+    { name: "Arijit Singh", role: "Main Artist" },
   ];
 };
