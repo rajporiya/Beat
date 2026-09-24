@@ -1,24 +1,27 @@
-import { AlertTriangle } from "lucide-react";
 import { useEffect } from "react";
 import { Topbar } from "@/components/c/Topbar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMusicStore } from "@/stores/useMusicStore";
 import { usePlayStore } from "@/stores/usePlayerStore";
-import FeaturedSection from "./home/componants/FeaturedSection";
 import PopularArtists from "./home/componants/PopularArtists";
 import SectionGrid from "./home/componants/SectionGrid";
+import {
+  SPOTIFY_TRENDING_SONGS,
+  SPOTIFY_POPULAR_ARTISTS,
+  SPOTIFY_POPULAR_ALBUMS,
+} from "@/data/spotifyHomeData";
 
 const HomePage = () => {
   const {
-    featureSong,
     fetchFeatureSong,
     fetchMadeForYouSong,
     fetchTrendingSong,
     isLoading,
     madeForYouSongs,
     trendingSong,
-    err,
   } = useMusicStore();
+
+  const { initalizeQueue } = usePlayStore();
 
   useEffect(() => {
     fetchFeatureSong();
@@ -26,43 +29,53 @@ const HomePage = () => {
     fetchTrendingSong();
   }, [fetchFeatureSong, fetchMadeForYouSong, fetchTrendingSong]);
 
-  const { initalizeQueue } = usePlayStore();
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const today = new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
+  // Combine fetched songs with our high-definition showcase items (prioritizing showcase to match photo)
+  const displayTrendingSongs =
+    trendingSong.length > 0
+      ? [
+          ...SPOTIFY_TRENDING_SONGS,
+          ...trendingSong.filter(
+            (s) => !SPOTIFY_TRENDING_SONGS.some((st) => st.title.toLowerCase() === s.title.toLowerCase())
+          ),
+        ]
+      : SPOTIFY_TRENDING_SONGS;
+
+  const displayAlbums =
+    madeForYouSongs.length > 0
+      ? [
+          ...SPOTIFY_POPULAR_ALBUMS,
+          ...madeForYouSongs.filter(
+            (s) => !SPOTIFY_POPULAR_ALBUMS.some((sa) => sa.title.toLowerCase() === s.title.toLowerCase())
+          ),
+        ]
+      : SPOTIFY_POPULAR_ALBUMS;
 
   useEffect(() => {
-    if (madeForYouSongs.length > 0 && featureSong.length > 0 && trendingSong.length > 0) {
-      initalizeQueue([...featureSong, ...madeForYouSongs, ...trendingSong]);
-    }
-  }, [initalizeQueue, featureSong, madeForYouSongs, trendingSong]);
+    initalizeQueue([...displayTrendingSongs, ...displayAlbums]);
+  }, [initalizeQueue, displayTrendingSongs, displayAlbums]);
 
   return (
-    <main className="flex h-full flex-col overflow-hidden rounded-md bg-gradient-to-b from-[#242424] via-[#121212] to-[#121212]">
+    <main className="flex h-full flex-col overflow-hidden bg-[#121212]">
       <Topbar />
 
       <ScrollArea className="min-h-0 flex-1">
-        <div className="space-y-9 p-5 sm:p-7">
-          <header>
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{greeting}</h1>
-            <p className="mt-1 text-sm text-zinc-400">{today}</p>
-          </header>
+        <div className="px-5 py-3 sm:px-7 sm:py-5 space-y-7 pb-24">
+          {/* Section 1: Trending songs */}
+          <SectionGrid
+            title="Trending songs"
+            songs={displayTrendingSongs}
+            isLoading={isLoading && !displayTrendingSongs.length}
+          />
 
-          {err && (
-            <div className="flex items-center gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-              <AlertTriangle className="size-4 shrink-0" />
-              {err}
-            </div>
-          )}
+          {/* Section 2: Popular artists */}
+          <PopularArtists artists={SPOTIFY_POPULAR_ARTISTS} />
 
-          <FeaturedSection />
-          <SectionGrid title="Trending songs" songs={trendingSong} isLoading={isLoading} />
-          <PopularArtists />
-          <SectionGrid title="Popular albums and singles" songs={madeForYouSongs} isLoading={isLoading} />
+          {/* Section 3: Popular albums and singles */}
+          <SectionGrid
+            title="Popular albums and singles"
+            songs={displayAlbums}
+            isLoading={isLoading && !displayAlbums.length}
+          />
         </div>
       </ScrollArea>
     </main>
