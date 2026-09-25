@@ -11,6 +11,7 @@ import DailyMixCard from "./home/componants/DailyMixCard";
 import PodcastCard from "./home/componants/PodcastCard";
 import PodcastVideoModal from "./home/componants/PodcastVideoModal";
 import FollowingSection from "./home/componants/FollowingSection";
+import { Footer } from "@/components/c/Footer";
 import {
   SPOTIFY_TRENDING_SONGS,
   SPOTIFY_POPULAR_ARTISTS,
@@ -125,7 +126,7 @@ const HomePage = () => {
       </div>
 
       <ScrollArea className="min-h-0 flex-1">
-        <div className="px-5 py-4 sm:px-7 space-y-9 pb-28">
+        <div className="px-5 py-4 sm:px-7 space-y-9">
           {/* ========================================================= */}
           {/* VIEW: MUSIC (Matching Image 2)                            */}
           {/* ========================================================= */}
@@ -309,6 +310,9 @@ const HomePage = () => {
               />
             </div>
           )}
+
+          {/* Footer — shown in all tabs */}
+          <Footer />
         </div>
       </ScrollArea>
 
