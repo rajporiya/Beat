@@ -5,6 +5,7 @@ import AudioPlayer from "./AudioPlayer";
 import PlayBackControl from "./componants/PlayBackControl";
 import { useEffect, useState } from "react";
 import MobileNav from "./componants/MobileNav";
+import { Topbar } from "@/components/c/Topbar";
 
 import { ChevronLeft } from "lucide-react";
 
@@ -48,7 +49,10 @@ const MainLayout = () => {
     <div className="h-screen bg-black text-white flex flex-col selection:bg-[#1ed760] selection:text-black">
       <AudioPlayer />
 
-      <div className="h-full flex flex-1 overflow-hidden gap-2 p-2 md:pb-2">
+      {/* Topbar — full width at the very top */}
+      <Topbar />
+
+      <div className="flex flex-1 overflow-hidden gap-2 px-2 pb-2">
         {/* Left Sidebar - width is fixed/dragged and NEVER decreases when right panel opens/closes */}
         {!isMobile && (
           <>

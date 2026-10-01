@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { Topbar } from "@/components/c/Topbar";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMusicStore } from "@/stores/useMusicStore";
 import { usePlayStore } from "@/stores/usePlayerStore";
@@ -102,7 +102,6 @@ const HomePage = () => {
 
   return (
     <main className="flex h-full flex-col overflow-hidden bg-[#121212] select-none">
-      <Topbar />
 
       {/* Filter Chips Bar (Replicating Spotify Top Navigation) */}
       <div className="sticky top-0 z-20 flex items-center gap-2 px-5 py-2.5 sm:px-7 bg-[#121212]/95 backdrop-blur-md shrink-0 overflow-x-auto no-scrollbar">
