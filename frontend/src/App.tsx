@@ -5,21 +5,32 @@ import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react"
 import MainLayout from "./layout/MainLayout"
 import ChatPage from "./pages/ChatPage"
 import AlbumPage from "./pages/home/AlbumPage"
-import AdminPage from "./pages/admin/AdminPage"
+import AdminLayout from "./pages/admin/layout/AdminLayout"
+import AdminDashboard from "./pages/admin/AdminDashboard"
 import SearchPage from "./pages/SearchPage"
 import LibraryPage from "./pages/LibraryPage"
 import CollectionPage from "./pages/CollectionPage"
 import ArtistPage from "./pages/ArtistPage"
 import AuthPage from "./pages/AuthPage"
 import ProfilePage from "./pages/ProfilePage"
+import AdminSongsPage from "./pages/admin/AdminSongsPage"
+import AdminAlbumsPage from "./pages/admin/AdminAlbumsPage"
+import AdminArtistsPage from "./pages/admin/AdminArtistsPage"
+import AdminUsersPage from "./pages/admin/AdminUsersPage"
 
 const App = () => {
   return (
     <>
        <Routes>
         <Route path='/sso-callback' element={<AuthenticateWithRedirectCallback signInForceRedirectUrl="/auth-callback" />} />
-        <Route path='/auth-callback' element={<AuthCallbackPage />} />
-        <Route path="/admin" element={<AdminPage/>}/>
+        <Route path='/auth-callback' element={<AuthCallbackPage />} />        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="songs" element={<AdminSongsPage />} />
+          <Route path="albums" element={<AdminAlbumsPage />} />
+          <Route path="artists" element={<AdminArtistsPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+        </Route>
+
         <Route path="/login" element={<AuthPage mode="login"/>}/>
         <Route path="/register" element={<AuthPage mode="register"/>}/>
         
