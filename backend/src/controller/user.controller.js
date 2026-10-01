@@ -1,11 +1,35 @@
 import { User } from "../models/user.models.js";
 import cloudinary from "../lib/cludinary.js";
+import { getAuth } from "@clerk/express";
+
+const getUserId = (req) => req.auth?.userId || getAuth(req)?.userId;
 
 const placeholderEmail = (clerkUserId) => `clerk_${clerkUserId}@unknown.local`;
 
-// Create the local user record from client-provided Clerk data (first login only).
-// Existing records are NEVER overwritten, so profile edits and avatar uploads persist.
+// Create or sync the local user record from client-provided Clerk data.
+// Existing records never overwrite custom user avatars or names.
 const upsertFromClerkSnapshot = async (clerkUserId, { fullName, imageUrl, email } = {}) => {
+    let user = await User.findOne({ clerkId: clerkUserId }).select("-password");
+    if (user) {
+        let changed = false;
+        if (!user.imageUrl && imageUrl) {
+            user.imageUrl = imageUrl;
+            changed = true;
+        }
+        if (!user.fullName && fullName) {
+            user.fullName = fullName;
+            changed = true;
+        }
+        if (email && (!user.email || user.email.endsWith("@unknown.local"))) {
+            user.email = String(email).trim().toLowerCase();
+            changed = true;
+        }
+        if (changed) {
+            await user.save({ validateBeforeSave: false });
+        }
+        return user;
+    }
+
     const setOnInsert = {
         fullName: fullName || "User",
         email: email ? String(email).trim().toLowerCase() : placeholderEmail(clerkUserId),
@@ -38,7 +62,7 @@ const findCurrentUser = (clerkUserId) =>
 
 export const getAllUsers = async (req, res, next ) => {
     try {
-        const currentUser = req.auth.userId;
+        const currentUser = getUserId(req);
         const users = await User.find({ clerkId : { $ne : currentUser}});
         res.status(200).json(users);
     } catch (error) {
@@ -52,7 +76,7 @@ export const syncMyProfile = async (req, res, next) => {
     try {
         const { firstName, lastName, imageUrl, email } = req.body ?? {};
         const fullName = `${firstName ?? ""} ${lastName ?? ""}`.trim();
-        const user = await upsertFromClerkSnapshot(req.auth.userId, { fullName, imageUrl, email });
+        const user = await upsertFromClerkSnapshot(getUserId(req), { fullName, imageUrl, email });
         if (!user) {
             return res.status(404).json({ message: "Profile not found. Please sign in again." });
         }
@@ -67,7 +91,7 @@ export const syncMyProfile = async (req, res, next) => {
 // Returns 204 when no local record exists yet (frontend then calls /sync)
 export const getMyProfile = async (req, res, next) => {
     try {
-        const user = await findCurrentUser(req.auth.userId);
+        const user = await findCurrentUser(getUserId(req));
         if (!user) {
             return res.status(204).send();
         }
@@ -81,7 +105,7 @@ export const getMyProfile = async (req, res, next) => {
 // PATCH /api/user/me — update name and/or email
 export const updateMyProfile = async (req, res, next) => {
     try {
-        const user = await findCurrentUser(req.auth.userId);
+        const user = await findCurrentUser(getUserId(req));
         if (!user) {
             return res.status(409).json({ message: "Profile not initialized yet — reload the page once to sync it" });
         }
@@ -136,7 +160,7 @@ export const uploadMyAvatar = async (req, res, next) => {
             return res.status(400).json({ message: "Image must be smaller than 5MB" });
         }
 
-        const user = await findCurrentUser(req.auth.userId);
+        const user = await findCurrentUser(getUserId(req));
         if (!user) {
             return res.status(409).json({ message: "Profile not initialized yet — reload the page once to sync it" });
         }

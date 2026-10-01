@@ -6,16 +6,25 @@ export const authCallback = async (req, res, next)=>{
         const { id, firstName, lastName, imageUrl, email } = req.body;
         const fullName = `${firstName ?? ""} ${lastName ?? ""}`.trim() || "User";
 
-        await User.findOneAndUpdate(
-            { clerkId: id },
-            {
+        const existing = await User.findOne({ clerkId: id });
+        if (!existing) {
+            await User.create({
                 clerkId: id,
                 fullName,
                 imageUrl,
-                $setOnInsert: { email: email ? String(email).trim().toLowerCase() : `clerk_${id}@unknown.local` },
-            },
-            { new: true, upsert: true, runValidators: true },
-        );
+                email: email ? String(email).trim().toLowerCase() : `clerk_${id}@unknown.local`,
+            });
+        } else {
+            const update = {};
+            if (!existing.imageUrl && imageUrl) update.imageUrl = imageUrl;
+            if (!existing.fullName && fullName) update.fullName = fullName;
+            if (email && (!existing.email || existing.email.endsWith("@unknown.local"))) {
+                update.email = String(email).trim().toLowerCase();
+            }
+            if (Object.keys(update).length > 0) {
+                await User.updateOne({ clerkId: id }, { $set: update });
+            }
+        }
 
         res.status(200).json ({
             success : true

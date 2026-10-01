@@ -1,4 +1,4 @@
-﻿import {
+import {
   SignedIn,
   SignedOut,
   useAuth,
@@ -16,20 +16,23 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStro } from "@/stores/useAuthStro";
+import { useUserProfileStore } from "@/stores/useUserProfileStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Topbar = () => {
   const { isAdmin, checkAdminStatus } = useAuthStro();
   const { isSignedIn } = useAuth();
   const { user } = useUser();
+  const { profile, fetchProfile } = useUserProfileStore();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
   useEffect(() => {
     if (isSignedIn) {
       checkAdminStatus();
+      if (!profile) fetchProfile();
     }
-  }, [isSignedIn, checkAdminStatus]);
+  }, [isSignedIn, checkAdminStatus, fetchProfile, profile]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,9 +41,12 @@ export const Topbar = () => {
     }
   };
 
+  const avatarUrl = profile?.imageUrl || user?.imageUrl;
+  const displayName = profile?.fullName || user?.fullName || user?.firstName || "U";
+
   // Initials avatar fallback
   const initials =
-    (user?.fullName || user?.firstName || "U")
+    displayName
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
@@ -174,7 +180,7 @@ export const Topbar = () => {
             className="rounded-full focus:outline-none"
           >
             <Avatar className="size-8 ring-2 ring-[#863bff]/60 transition-all hover:ring-[#863bff]">
-              {user?.imageUrl ? <AvatarImage src={user.imageUrl} alt={user.fullName ?? "Profile"} /> : null}
+              {avatarUrl ? <AvatarImage key={avatarUrl} src={avatarUrl} alt={displayName} /> : null}
               <AvatarFallback className="bg-[#242424] text-xs font-bold text-white">{initials}</AvatarFallback>
             </Avatar>
           </button>

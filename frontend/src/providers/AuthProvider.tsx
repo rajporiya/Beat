@@ -4,6 +4,8 @@ import { Loader } from "lucide-react";
 import { axiosInstance } from "@/lib/axios";
 import { useAuthStro } from "@/stores/useAuthStro";
 
+import { useUserProfileStore } from "@/stores/useUserProfileStore";
+
 type AuthProviderProps = {
   children: ReactNode;
 };
@@ -33,8 +35,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         updateApiToken(token)
         if(token){
           await checkAdminStatus()
+          void useUserProfileStore.getState().fetchProfile();
         } else {
           reset()
+          useUserProfileStore.getState().setProfile(null);
         }
       } catch (error) {
         updateApiToken(null)

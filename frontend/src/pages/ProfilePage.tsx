@@ -80,7 +80,16 @@ export default function ProfilePage() {
     setFormError(null);
     setSuccess(null);
     const ok = await uploadAvatar(file);
-    if (ok) setSuccess("Profile photo updated");
+    if (ok) {
+      if (clerkUser && typeof (clerkUser as any).setProfileImage === "function") {
+        try {
+          await (clerkUser as any).setProfileImage({ file });
+        } catch (err) {
+          console.warn("Clerk avatar sync skipped:", err);
+        }
+      }
+      setSuccess("Profile photo updated");
+    }
   };
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -101,7 +110,19 @@ export default function ProfilePage() {
     }
 
     const ok = await updateProfile({ fullName: name, email: mail });
-    if (ok) setSuccess("Profile updated successfully");
+    if (ok) {
+      if (clerkUser && typeof (clerkUser as any).update === "function") {
+        try {
+          const parts = name.split(" ");
+          const firstName = parts[0] || "";
+          const lastName = parts.slice(1).join(" ") || "";
+          await (clerkUser as any).update({ firstName, lastName });
+        } catch (err) {
+          console.warn("Clerk profile sync skipped:", err);
+        }
+      }
+      setSuccess("Profile updated successfully");
+    }
   };
 
   if ((isProfileLoading || !loaded) && !profile) {
@@ -137,6 +158,8 @@ export default function ProfilePage() {
       .map((part) => part[0]?.toUpperCase())
       .join("") || "U";
 
+  const avatarUrl = profile.imageUrl || clerkUser?.imageUrl;
+
   return (
     <div className="mx-auto w-full max-w-2xl overflow-y-auto p-5 sm:p-8">
       <h1 className="text-2xl font-black text-white sm:text-3xl">Account Overview</h1>
@@ -154,8 +177,8 @@ export default function ProfilePage() {
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
           <div className="relative">
             <Avatar className="size-24">
-              {profile.imageUrl ? (
-                <AvatarImage src={profile.imageUrl} alt={profile.fullName} />
+              {avatarUrl ? (
+                <AvatarImage key={avatarUrl} src={avatarUrl} alt={profile.fullName} />
               ) : null}
               <AvatarFallback className="bg-[#242424] text-xl font-bold text-white">
                 {initials}

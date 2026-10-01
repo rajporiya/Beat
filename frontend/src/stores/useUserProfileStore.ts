@@ -22,6 +22,7 @@ interface UserProfileStore {
   syncProfile: (clerkData: { firstName?: string | null; lastName?: string | null; imageUrl?: string; email?: string | null }) => Promise<boolean>;
   updateProfile: (data: { fullName?: string; email?: string }) => Promise<boolean>;
   uploadAvatar: (file: File) => Promise<boolean>;
+  setProfile: (profile: Profile | null) => void;
 }
 
 export const useUserProfileStore = create<UserProfileStore>((set) => ({
@@ -84,7 +85,11 @@ export const useUserProfileStore = create<UserProfileStore>((set) => ({
     try {
       const formData = new FormData();
       formData.append("avatar", file);
-      const res = await axiosInstance.post("/user/avatar", formData);
+      const res = await axiosInstance.post("/user/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       set({ profile: res.data });
       return true;
     } catch (error: any) {
@@ -94,4 +99,6 @@ export const useUserProfileStore = create<UserProfileStore>((set) => ({
       set({ isUploadingAvatar: false });
     }
   },
+
+  setProfile: (profile) => set({ profile }),
 }));
