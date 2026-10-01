@@ -1,7 +1,6 @@
 ﻿import {
   SignedIn,
   SignedOut,
-  UserButton,
   useAuth,
   useUser,
 } from "@clerk/clerk-react";
@@ -17,6 +16,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuthStro } from "@/stores/useAuthStro";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export const Topbar = () => {
   const { isAdmin, checkAdminStatus } = useAuthStro();
@@ -39,7 +39,13 @@ export const Topbar = () => {
   };
 
   // Initials avatar fallback
-  const initials = user?.firstName?.[0]?.toUpperCase() ?? "U";
+  const initials =
+    (user?.fullName || user?.firstName || "U")
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "U";
 
   return (
     <div className="flex items-center justify-between gap-2 px-4 py-2.5 top-0 bg-[#121212] z-10 shrink-0 border-b border-white/5">
@@ -158,15 +164,20 @@ export const Topbar = () => {
           </button>
         </SignedIn>
 
-        {/* Avatar / UserButton */}
+        {/* Avatar / Profile link */}
         <SignedIn>
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "size-8 ring-2 ring-[#863bff]/60 hover:ring-[#863bff] transition-all",
-              },
-            }}
-          />
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
+            aria-label="Open your profile"
+            title="Your profile"
+            className="rounded-full focus:outline-none"
+          >
+            <Avatar className="size-8 ring-2 ring-[#863bff]/60 transition-all hover:ring-[#863bff]">
+              {user?.imageUrl ? <AvatarImage src={user.imageUrl} alt={user.fullName ?? "Profile"} /> : null}
+              <AvatarFallback className="bg-[#242424] text-xs font-bold text-white">{initials}</AvatarFallback>
+            </Avatar>
+          </button>
         </SignedIn>
       </div>
     </div>

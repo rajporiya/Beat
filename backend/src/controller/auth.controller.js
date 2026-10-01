@@ -3,7 +3,7 @@ import { User } from "../models/user.models.js";
 
 export const authCallback = async (req, res, next)=>{
     try {
-        const { id, firstName, lastName, imageUrl} = req.body;
+        const { id, firstName, lastName, imageUrl, email } = req.body;
         const fullName = `${firstName ?? ""} ${lastName ?? ""}`.trim() || "User";
 
         await User.findOneAndUpdate(
@@ -12,6 +12,7 @@ export const authCallback = async (req, res, next)=>{
                 clerkId: id,
                 fullName,
                 imageUrl,
+                $setOnInsert: { email: email ? String(email).trim().toLowerCase() : `clerk_${id}@unknown.local` },
             },
             { new: true, upsert: true, runValidators: true },
         );

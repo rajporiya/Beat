@@ -11,6 +11,7 @@ import LibraryPage from "./pages/LibraryPage"
 import CollectionPage from "./pages/CollectionPage"
 import ArtistPage from "./pages/ArtistPage"
 import AuthPage from "./pages/AuthPage"
+import ProfilePage from "./pages/ProfilePage"
 
 const App = () => {
   return (
@@ -30,9 +31,9 @@ const App = () => {
           <Route path="/liked" element={<CollectionPage type="liked" />}/>
           <Route path="/recently-played" element={<CollectionPage type="recent" />}/>
           <Route path="/artist/:artistId" element={<ArtistPage />}/>
-          <Route path="/playlist/:playlistId" element={<CollectionPage type="liked" />}/>
-          <Route path="/chat" element={<ChatPage />}/>
+          <Route path="/playlist/:playlistId" element={<CollectionPage type="liked" />}/>          <Route path="/chat" element={<ChatPage />}/>
           <Route path="/album/:albumId" element={<AlbumPage />}/>
+          <Route path="/profile" element={<ProfilePage />}/>
         </Route>
        </Routes>
       </>
