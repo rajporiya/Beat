@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { useUser } from "@clerk/clerk-react";
-import { Camera, Loader2, Mail, Save, TriangleAlert, User as UserIcon } from "lucide-react";
+import { useClerk, useUser } from "@clerk/clerk-react";
+import { Camera, Loader2, LogOut, Mail, Save, TriangleAlert, User as UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUserProfileStore } from "@/stores/useUserProfileStore";
 
@@ -19,8 +19,11 @@ export default function ProfilePage() {
     syncProfile,
     updateProfile,
     uploadAvatar,
+    logout,
   } = useUserProfileStore();
   const { user: clerkUser } = useUser();
+  const { signOut } = useClerk();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fullName, setFullName] = useState("");
@@ -61,6 +64,16 @@ export default function ProfilePage() {
     : false;
 
   const handleSelectAvatar = () => fileInputRef.current?.click();
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await logout(); // POST /api/user/logout (clears session cookie server-side)
+    } finally {
+      void signOut({ redirectUrl: "/" }); // ends the Clerk session, back to home
+    }
+  };
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -278,6 +291,23 @@ export default function ProfilePage() {
             {isUpdating ? "Saving..." : "Save changes"}
           </button>
         </form>
+      </section>
+
+      {/* Logout */}
+      <section className="mt-4 flex flex-col gap-3 rounded-2xl bg-[#181818] p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-white">Log out</h2>
+          <p className="mt-1 text-sm text-zinc-400">End your session on this device.</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex items-center justify-center gap-2 rounded-full border border-red-500/50 bg-red-500/10 px-6 py-2.5 font-bold text-red-400 transition-colors hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isLoggingOut ? <Loader2 className="size-4 animate-spin" /> : <LogOut className="size-4" />}
+          {isLoggingOut ? "Logging out..." : "Log out"}
+        </button>
       </section>
     </div>
   );

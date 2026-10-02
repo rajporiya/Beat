@@ -70,6 +70,18 @@ export const getAllUsers = async (req, res, next ) => {
     }
 }
 
+// POST /api/user/logout — end the session server-side.
+// Session tokens live in the `__session` cookie (Clerk), so clear it.
+export const logoutUser = async (req, res, next) => {
+    try {
+        res.clearCookie("__session");
+        res.clearCookie("__client", { path: "/" });
+        res.status(200).json({ success: true, message: "Logged out successfully" });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // POST /api/user/sync — create the local profile the first time, using the
 // Clerk user data sent from the frontend (same pattern as /auth/callback)
 export const syncMyProfile = async (req, res, next) => {

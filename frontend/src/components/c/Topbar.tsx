@@ -58,12 +58,12 @@ export const Topbar = () => {
 
       {/* LEFT: Logo */}
       <div className="flex items-center gap-3 shrink-0">
-        <Link to="/home" aria-label="BeatMusic Home">
-          <div className="size-9 rounded-full bg-white flex items-center justify-center overflow-hidden hover:scale-105 transition-transform shrink-0">
+        <Link to="/home" aria-label="Spotify Home">
+          <div className="size-9 flex items-center justify-center hover:scale-105 transition-transform shrink-0">
             <img
               src="/Animation/title.svg"
-              alt="BeatMusic"
-              className="w-full h-full object-contain scale-75"
+              alt="Spotify Logo"
+              className="size-9 object-contain"
             />
           </div>
         </Link>

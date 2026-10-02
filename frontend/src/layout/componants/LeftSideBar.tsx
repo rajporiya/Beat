@@ -91,12 +91,12 @@ return (
                         ))
                     )}
                     <footer className='hidden md:flex flex-wrap gap-x-4 gap-y-2 px-1 pt-8 text-[11px] text-zinc-400'>
-                        <a href="/info/legal" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Legal</a>
-                        <a href="/info/safety" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Safety &amp; Privacy Center</a>
-                        <a href="/info/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Privacy Policy</a>
-                        <a href="/info/cookies" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Cookies</a>
-                        <a href="/info/ads" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">About Ads</a>
-                        <a href="/info/accessibility" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Accessibility</a>
+                        <Link to="/info/legal" className="hover:text-white hover:underline transition-colors">Legal</Link>
+                        <Link to="/info/safety" className="hover:text-white hover:underline transition-colors">Safety &amp; Privacy Center</Link>
+                        <Link to="/info/privacy" className="hover:text-white hover:underline transition-colors">Privacy Policy</Link>
+                        <Link to="/info/cookies" className="hover:text-white hover:underline transition-colors">Cookies</Link>
+                        <Link to="/info/ads" className="hover:text-white hover:underline transition-colors">About Ads</Link>
+                        <Link to="/info/accessibility" className="hover:text-white hover:underline transition-colors">Accessibility</Link>
                     </footer>
                 </div>
             </ScrollArea>

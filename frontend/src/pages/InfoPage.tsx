@@ -1,312 +1,420 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import {
-  Building2,
-  Briefcase,
-  Newspaper,
-  Mic2,
-  Sparkles,
-  Radio,
-  Code2,
-  Megaphone,
-  TrendingUp,
-  Store,
-  HelpCircle,
-  Smartphone,
-  Globe2,
-  Music,
-  FolderInput,
-  Crown,
-  ShieldCheck,
-  GraduationCap,
-  Music2,
-  Scale,
-  ShieldAlert,
-  Cookie,
-  EyeOff,
-  Accessibility as AccessibilityIcon,
-  ExternalLink,
-  CheckCircle2,
-  Search,
-  ArrowRight,
-  Zap,
-} from "lucide-react";
-
-interface MenuItem {
-  slug: string;
-  label: string;
-  category: string;
-  icon: React.ElementType;
-  badge?: string;
-}
-
-export const MENU_CATEGORIES = [
-  { id: "company", title: "Company" },
-  { id: "communities", title: "Communities" },
-  { id: "useful", title: "Useful Links" },
-  { id: "plans", title: "BeatMusic Plans" },
-  { id: "legal", title: "Legal & Privacy" },
-];
-
-export const ALL_MENU_ITEMS: MenuItem[] = [
-  // Company
-  { slug: "about", label: "About BeatMusic", category: "company", icon: Building2 },
-  { slug: "jobs", label: "Jobs & Careers", category: "company", icon: Briefcase, badge: "We're Hiring" },
-  { slug: "newsroom", label: "For the Record", category: "company", icon: Newspaper },
-
-  // Communities
-  { slug: "for-artists", label: "For Artists", category: "communities", icon: Mic2 },
-  { slug: "for-creators", label: "For Creators", category: "communities", icon: Sparkles },
-  { slug: "for-podcasters", label: "For Podcasters", category: "communities", icon: Radio },
-  { slug: "for-developers", label: "For Developers", category: "communities", icon: Code2, badge: "API v2" },
-  { slug: "advertising", label: "Advertising", category: "communities", icon: Megaphone },
-  { slug: "investors", label: "Investors", category: "communities", icon: TrendingUp },
-  { slug: "vendors", label: "Vendors", category: "communities", icon: Store },
-
-  // Useful links
-  { slug: "support", label: "Support & Help", category: "useful", icon: HelpCircle },
-  { slug: "download", label: "Free Mobile App", category: "useful", icon: Smartphone },
-  { slug: "charts", label: "Popular by Country", category: "useful", icon: Globe2 },
-  { slug: "lyrics", label: "Top Song Lyrics", category: "useful", icon: Music },
-  { slug: "import", label: "Import your music", category: "useful", icon: FolderInput },
-
-  // Plans
-  { slug: "premium", label: "Premium Standard", category: "plans", icon: Crown, badge: "Popular" },
-  { slug: "premium-platinum", label: "Premium Platinum", category: "plans", icon: Zap, badge: "Hi-Fi" },
-  { slug: "premium-student", label: "Premium Student", category: "plans", icon: GraduationCap, badge: "50% Off" },
-  { slug: "free", label: "BeatMusic Free", category: "plans", icon: Music2 },
-
-  // Legal
-  { slug: "legal", label: "Legal", category: "legal", icon: Scale },
-  { slug: "safety", label: "Safety & Privacy Center", category: "legal", icon: ShieldAlert },
-  { slug: "privacy", label: "Privacy Policy", category: "legal", icon: ShieldCheck },
-  { slug: "cookies", label: "Cookie Policy", category: "legal", icon: Cookie },
-  { slug: "ads", label: "About Ads", category: "legal", icon: EyeOff },
-  { slug: "accessibility", label: "Accessibility", category: "legal", icon: AccessibilityIcon },
-];
+import React, { useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUserProfileStore } from "@/stores/useUserProfileStore";
+import { AboutPage } from "./AboutPage";
+import { ArrowRight, Laptop, Smartphone } from "lucide-react";
 
 export const InfoPage: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
-  const navigate = useNavigate();
+  const { user } = useUser();
+  const { profile } = useUserProfileStore();
 
-  const currentSlug = slug || "about";
-  const currentItem = ALL_MENU_ITEMS.find((item) => item.slug === currentSlug) || ALL_MENU_ITEMS[0];
-  const [filterQuery, setFilterQuery] = useState("");
+  const currentSlug = slug || "jobs";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentSlug]);
 
-  const handleSelectSlug = (newSlug: string) => {
-    navigate(`/info/${newSlug}`);
-  };
+  if (currentSlug === "about") {
+    return <AboutPage />;
+  }
 
-  const filteredItems = ALL_MENU_ITEMS.filter((item) =>
-    item.label.toLowerCase().includes(filterQuery.toLowerCase())
-  );
+  const avatarUrl = profile?.imageUrl || user?.imageUrl;
+  const displayName = profile?.fullName || user?.fullName || user?.firstName || "U";
+  const initials =
+    displayName
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "U";
 
   return (
-    <div className="flex-1 overflow-y-auto bg-gradient-to-b from-[#181226] via-[#121212] to-[#0a0a0a] text-zinc-100 p-4 sm:p-6 lg:p-8">
-      {/* Header Banner */}
-      <div className="mx-auto max-w-7xl mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="size-11 rounded-xl bg-gradient-to-tr from-[#863bff] to-[#ec4899] flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <currentItem.icon className="size-6 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs uppercase tracking-wider font-semibold text-[#a855f7]">
-                  BeatMusic Portal
-                </span>
-                {currentItem.badge && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#863bff]/30 text-purple-300 border border-[#863bff]/50">
-                    {currentItem.badge}
-                  </span>
-                )}
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {currentItem.label}
-              </h1>
-            </div>
-          </div>
+    <div className="min-h-screen bg-white text-zinc-900 font-sans flex flex-col">
+      {/* Top Black Header (Identical to AboutPage) */}
+      <header className="bg-black text-white px-6 sm:px-12 lg:px-20 h-20 flex items-center justify-between sticky top-0 z-50">
+        {/* Left: Spotify / BeatMusic Logo */}
+        <Link to="/home" className="flex items-center gap-2 group cursor-pointer">
+          <img
+            src="/Animation/title.svg"
+            alt="Spotify Logo"
+            className="size-9 transition-transform group-hover:scale-105"
+          />
+          <span className="font-bold text-2xl tracking-tight text-white">
+            Beat<span className="text-[#1db954]">Music</span>
+          </span>
+        </Link>
 
+        {/* Right Nav Links */}
+        <nav className="flex items-center gap-5 sm:gap-7 text-sm font-bold tracking-tight">
           <Link
-            to="/home"
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-700 text-xs font-semibold text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors w-fit"
+            to="/info/premium"
+            className="text-white hover:text-[#1db954] transition-colors hidden sm:inline"
           >
-            <span>Open BeatMusic Web Player</span>
-            <ExternalLink className="size-3.5" />
+            Premium plans
           </Link>
-        </div>
-      </div>
+          <Link
+            to="/info/support"
+            className="text-white hover:text-[#1db954] transition-colors"
+          >
+            Support
+          </Link>
+          <Link
+            to="/info/download"
+            className="text-white hover:text-[#1db954] transition-colors hidden md:inline"
+          >
+            Download
+          </Link>
 
-      {/* Main Grid: Left Navigation Menu + Right Content */}
-      <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Side Menu */}
-        <aside className="lg:col-span-4 xl:col-span-3 sticky top-4 bg-[#181818]/90 backdrop-blur-md rounded-2xl border border-white/10 p-4 shadow-xl">
-          {/* Quick Search */}
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-2.5 size-4 text-zinc-400" />
-            <input
-              type="text"
-              value={filterQuery}
-              onChange={(e) => setFilterQuery(e.target.value)}
-              placeholder="Search topics..."
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[#242424] border border-white/5 text-white placeholder-zinc-500 focus:outline-none focus:border-[#863bff]"
-            />
-          </div>
+          <span className="text-zinc-600 hidden sm:inline select-none">|</span>
 
-          <div className="max-h-[calc(100vh-220px)] overflow-y-auto space-y-5 pr-1">
-            {MENU_CATEGORIES.map((cat) => {
-              const itemsInCat = filteredItems.filter((i) => i.category === cat.id);
-              if (itemsInCat.length === 0) return null;
+          <SignedOut>
+            <Link
+              to="/register"
+              className="text-zinc-400 hover:text-white transition-colors"
+            >
+              Sign up
+            </Link>
+            <Link
+              to="/login"
+              className="text-white hover:text-[#1db954] transition-colors"
+            >
+              Log in
+            </Link>
+          </SignedOut>
 
-              return (
-                <div key={cat.id}>
-                  <p className="px-2 mb-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
-                    {cat.title}
-                  </p>
-                  <div className="space-y-1">
-                    {itemsInCat.map((item) => {
-                      const isActive = item.slug === currentSlug;
-                      const Icon = item.icon;
-                      return (
-                        <button
-                          key={item.slug}
-                          onClick={() => handleSelectSlug(item.slug)}
-                          className={`w-full flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-left transition-all ${
-                            isActive
-                              ? "bg-gradient-to-r from-[#863bff] to-[#6d28d9] text-white shadow-md shadow-purple-900/30 font-bold"
-                              : "text-zinc-300 hover:text-white hover:bg-white/5"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <Icon className={`size-4 shrink-0 ${isActive ? "text-white" : "text-zinc-400"}`} />
-                            <span className="truncate">{item.label}</span>
-                          </div>
-                          {item.badge && (
-                            <span
-                              className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold shrink-0 ${
-                                isActive ? "bg-white/20 text-white" : "bg-zinc-800 text-purple-300"
-                              }`}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
+          <SignedIn>
+            <Link
+              to="/profile"
+              className="flex items-center gap-2 text-white hover:text-[#1db954] transition-colors"
+              title="Your Profile"
+            >
+              <Avatar className="size-8 ring-2 ring-[#1db954]/60">
+                {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
+                <AvatarFallback className="bg-zinc-800 text-xs font-bold text-white">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <span className="hidden lg:inline text-xs font-semibold">{displayName}</span>
+            </Link>
+            <Link
+              to="/home"
+              className="px-3.5 py-1.5 rounded-full bg-white text-black text-xs font-bold hover:bg-zinc-200 transition-colors shadow-sm"
+            >
+              Web Player
+            </Link>
+          </SignedIn>
+        </nav>
+      </header>
+
+      {/* Main Content Area (2 Columns - Identical to AboutPage) */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-6 sm:px-12 py-12 sm:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+          {/* Left Column (Selected Menu Topic Content) */}
+          <section className="lg:col-span-7 space-y-10">
+            {renderTopicContent(currentSlug)}
+
+            {/* Topic Navigation Quick Links */}
+            <div className="pt-8 border-t border-zinc-200">
+              <h3 className="text-xl sm:text-2xl font-bold text-black tracking-tight mb-4">
+                Explore more topics:
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <Link
+                  to="/info/jobs"
+                  className="p-3.5 rounded-lg border border-zinc-200 hover:border-black font-semibold text-zinc-800 hover:text-black hover:bg-zinc-50 transition-colors"
+                >
+                  Jobs & Careers →
+                </Link>
+                <Link
+                  to="/info/for-artists"
+                  className="p-3.5 rounded-lg border border-zinc-200 hover:border-black font-semibold text-zinc-800 hover:text-black hover:bg-zinc-50 transition-colors"
+                >
+                  For Artists →
+                </Link>
+                <Link
+                  to="/info/for-developers"
+                  className="p-3.5 rounded-lg border border-zinc-200 hover:border-black font-semibold text-zinc-800 hover:text-black hover:bg-zinc-50 transition-colors"
+                >
+                  Developer Platform →
+                </Link>
+                <Link
+                  to="/info/support"
+                  className="p-3.5 rounded-lg border border-zinc-200 hover:border-black font-semibold text-zinc-800 hover:text-black hover:bg-zinc-50 transition-colors"
+                >
+                  Support & Help →
+                </Link>
+              </div>
+            </div>
+          </section>
+
+          {/* Right Column (Offices & Contact Information - Identical to AboutPage) */}
+          <section className="lg:col-span-5 space-y-10">
+            {/* Headquarters Card */}
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight mb-6">
+                Headquarters
+              </h2>
+              <div className="space-y-1 text-sm text-zinc-700 leading-relaxed">
+                <p className="font-bold text-black text-base">BeatMusic AB</p>
+                <p>Regeringsgatan 19</p>
+                <p>SE-111 53 Stockholm</p>
+                <p>Sweden</p>
+                <p className="text-xs text-zinc-500 pt-1">Reg no: 556703-7485</p>
+                <a
+                  href="mailto:office@beatmusic.com"
+                  className="inline-block text-[#1db954] hover:underline font-medium pt-2"
+                >
+                  office@beatmusic.com
+                </a>
+              </div>
+            </div>
+
+            {/* BeatMusic around the world */}
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight mb-6">
+                BeatMusic around the world
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-[13px] leading-relaxed text-zinc-800">
+                {/* USA */}
+                <div className="space-y-0.5">
+                  <p className="font-bold text-black text-sm">BeatMusic USA Inc.</p>
+                  <p>4 World Trade Center</p>
+                  <p>150 Greenwich St, 62nd Floor</p>
+                  <p>New York, NY 10007, USA</p>
+                  <a href="mailto:office@beatmusic.com" className="text-[#1db954] hover:underline block pt-1">
+                    office@beatmusic.com
+                  </a>
                 </div>
-              );
-            })}
-          </div>
-        </aside>
 
-        {/* Right Main Content Panel */}
-        <main className="lg:col-span-8 xl:col-span-9 bg-[#181818]/70 backdrop-blur-md rounded-2xl border border-white/10 p-6 sm:p-8 shadow-2xl">
-          {renderContent(currentSlug)}
-        </main>
-      </div>
+                {/* UK */}
+                <div className="space-y-0.5">
+                  <p className="font-bold text-black text-sm">BeatMusic UK Ltd.</p>
+                  <p>Adelphi Building, 1-11 John Adam St</p>
+                  <p>London WC2N 6HT</p>
+                  <p>United Kingdom</p>
+                  <a href="mailto:office@beatmusic.com" className="text-[#1db954] hover:underline block pt-1">
+                    office@beatmusic.com
+                  </a>
+                </div>
+
+                {/* India */}
+                <div className="space-y-0.5">
+                  <p className="font-bold text-black text-sm">BeatMusic India LLP</p>
+                  <p>Jet Airways - Godrej BKC</p>
+                  <p>Bandra Kurla Complex, Bandra East</p>
+                  <p>Mumbai 400051, India</p>
+                  <a href="mailto:office@beatmusic.com" className="text-[#1db954] hover:underline block pt-1">
+                    office@beatmusic.com
+                  </a>
+                </div>
+
+                {/* Germany */}
+                <div className="space-y-0.5">
+                  <p className="font-bold text-black text-sm">BeatMusic GmbH</p>
+                  <p>Unter den Linden 10</p>
+                  <p>10117 Berlin</p>
+                  <p>Germany</p>
+                  <a href="mailto:office@beatmusic.com" className="text-[#1db954] hover:underline block pt-1">
+                    office@beatmusic.com
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      {/* Footer Bottom Bar (Identical to AboutPage) */}
+      <footer className="bg-black text-zinc-400 py-10 px-6 sm:px-12 lg:px-20 text-xs border-t border-zinc-800">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-wrap items-center gap-5">
+            <Link to="/info/legal" className="hover:text-white transition-colors">
+              Legal
+            </Link>
+            <Link to="/info/safety" className="hover:text-white transition-colors">
+              Safety & Privacy Center
+            </Link>
+            <Link to="/info/privacy" className="hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/info/cookies" className="hover:text-white transition-colors">
+              Cookies
+            </Link>
+            <Link to="/info/about" className="hover:text-white transition-colors">
+              About Ads
+            </Link>
+            <Link to="/info/accessibility" className="hover:text-white transition-colors">
+              Accessibility
+            </Link>
+          </div>
+
+          {/* Social Media Links */}
+          <div className="flex items-center gap-3">
+            <a
+              href="https://open.spotify.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify"
+              title="Spotify Web Player"
+              className="size-8 rounded-full bg-[#292929] hover:bg-[#1db954] text-white flex items-center justify-center transition-all duration-200 shadow-md group hover:scale-105"
+            >
+              <svg className="size-4 fill-current transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.503 17.306c-.218.358-.68.472-1.038.254-2.846-1.738-6.428-2.132-10.648-1.168-.41.094-.817-.16-.91-.568-.094-.41.16-.816.568-.91 4.622-1.055 8.583-.607 11.774 1.354.358.218.472.68.254 1.038zm1.469-3.266c-.274.446-.86.588-1.306.314-3.258-2.003-8.225-2.585-12.078-1.414-.498.152-1.026-.134-1.178-.632-.152-.498.134-1.026.632-1.178 4.408-1.338 9.89-.691 13.616 1.604.446.274.588.86.314 1.306zm.126-3.41c-3.908-2.32-10.354-2.533-14.076-1.402-.6.182-1.238-.16-1.42-.76-.182-.6.16-1.238.76-1.42 4.284-1.301 11.397-1.052 15.897 1.62.538.32.716 1.02.396 1.558-.32.538-1.02.716-1.557.396z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.instagram.com/spotify/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify on Instagram"
+              title="Spotify on Instagram"
+              className="size-8 rounded-full bg-[#292929] hover:bg-[#E1306C] text-white flex items-center justify-center transition-all duration-200 shadow-md group hover:scale-105"
+            >
+              <svg className="size-4 fill-current transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+              </svg>
+            </a>
+            <a
+              href="https://x.com/spotify"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify on X (Twitter)"
+              title="Spotify on X (Twitter)"
+              className="size-8 rounded-full bg-[#292929] hover:bg-black hover:border hover:border-zinc-700 text-white flex items-center justify-center transition-all duration-200 shadow-md group hover:scale-105"
+            >
+              <svg className="size-3.5 fill-current transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.facebook.com/Spotify"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Spotify on Facebook"
+              title="Spotify on Facebook"
+              className="size-8 rounded-full bg-[#292929] hover:bg-[#1877F2] text-white flex items-center justify-center transition-all duration-200 shadow-md group hover:scale-105"
+            >
+              <svg className="size-4 fill-current transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
+              </svg>
+            </a>
+          </div>
+
+          <div className="text-zinc-500 whitespace-nowrap">
+            © {new Date().getFullYear()} BeatMusic AB
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
-/* ---------------- Render Content helper for each slug ---------------- */
-function renderContent(slug: string) {
+/* ---------------- Render Specific Topic Content ---------------- */
+function renderTopicContent(slug: string) {
   switch (slug) {
-    /* ================= COMPANY ================= */
-    case "about":
+    /* ================= JOBS & CAREERS ================= */
+    case "jobs":
       return (
         <div className="space-y-8">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-              Powering the soundtrack to your life
-            </h2>
-            <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
-              With BeatMusic, it’s easy to find the right music or podcast for every moment — on your phone,
-              your computer, your tablet and more. There are millions of tracks and episodes on BeatMusic.
-              So whether you’re behind the wheel, working out, partying or relaxing, the right audio is always
-              at your fingertips.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/30 to-zinc-900 border border-purple-500/20">
-              <span className="text-3xl font-black text-white">100M+</span>
-              <p className="text-xs text-zinc-400 mt-1">High fidelity tracks available globally</p>
-            </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/30 to-zinc-900 border border-purple-500/20">
-              <span className="text-3xl font-black text-white">180+</span>
-              <p className="text-xs text-zinc-400 mt-1">Countries and territories covered</p>
-            </div>
-            <div className="p-4 rounded-xl bg-gradient-to-br from-purple-900/30 to-zinc-900 border border-purple-500/20">
-              <span className="text-3xl font-black text-white">500M+</span>
-              <p className="text-xs text-zinc-400 mt-1">Active music lovers tuning in each month</p>
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-4 border-t border-white/5">
-            <h3 className="text-lg font-bold text-white">Our Core Mission</h3>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              To unlock the potential of human creativity by giving millions of creative artists the opportunity to live
-              off their art and billions of fans the opportunity to enjoy and be inspired by it.
-            </p>
-          </div>
-        </div>
-      );
-
-    case "jobs":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Join Our Team at BeatMusic</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Jobs & Careers
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
               We are sound architects, engineers, designers, and music storytellers shaping the future of global audio streaming.
+              Explore our current open positions and build the world's most beloved music experience.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { role: "Senior Audio Streaming Engineer", dept: "Engineering", loc: "Remote / New York" },
-              { role: "Product Designer, Design Systems", dept: "Product", loc: "Remote / London" },
-              { role: "Music Curation Specialist", dept: "Editorial", loc: "Mumbai / Hybrid" },
-              { role: "Cloud Infrastructure Architect", dept: "DevOps", loc: "San Francisco" },
-            ].map((job) => (
-              <div
-                key={job.role}
-                className="p-5 rounded-xl bg-zinc-900 border border-white/10 hover:border-[#863bff] transition-all flex flex-col justify-between gap-3 group"
-              >
-                <div>
-                  <div className="flex items-center justify-between text-xs text-purple-400 font-semibold mb-1">
-                    <span>{job.dept}</span>
-                    <span className="text-zinc-400">{job.loc}</span>
-                  </div>
-                  <h4 className="font-bold text-white text-sm group-hover:text-purple-300 transition-colors">
-                    {job.role}
-                  </h4>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => alert(`Applied for ${job.role}`)}
-                  className="mt-2 text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 w-fit"
+          <div>
+            <h2 className="text-2xl font-extrabold text-black tracking-tight mb-5">
+              Open Positions
+            </h2>
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                { role: "Senior Audio Streaming Engineer", dept: "Engineering", loc: "Remote / New York", type: "Full-Time" },
+                { role: "Product Designer, Design Systems", dept: "Product", loc: "Remote / London", type: "Full-Time" },
+                { role: "Music Curation Specialist", dept: "Editorial", loc: "Mumbai / Hybrid", type: "Full-Time" },
+                { role: "Cloud Infrastructure Architect", dept: "DevOps", loc: "San Francisco", type: "Full-Time" },
+              ].map((job) => (
+                <div
+                  key={job.role}
+                  className="p-5 rounded-xl border border-zinc-200 hover:border-black transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group hover:bg-zinc-50"
                 >
-                  <span>Apply Now</span>
-                  <ArrowRight className="size-3" />
-                </button>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-xs font-bold">
+                      <span className="text-[#1db954]">{job.dept}</span>
+                      <span className="text-zinc-400">•</span>
+                      <span className="text-zinc-500">{job.loc}</span>
+                      <span className="text-zinc-400">•</span>
+                      <span className="text-zinc-500">{job.type}</span>
+                    </div>
+                    <h3 className="font-bold text-black text-lg group-hover:text-[#1db954] transition-colors">
+                      {job.role}
+                    </h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => alert(`Thank you! Your application for "${job.role}" has been submitted.`)}
+                    className="px-5 py-2.5 rounded-full bg-black text-white hover:bg-[#1db954] hover:text-black font-bold text-xs transition-colors shrink-0 flex items-center justify-center gap-1.5"
+                  >
+                    <span>Apply Now</span>
+                    <ArrowRight className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-zinc-200">
+            <h2 className="text-2xl font-extrabold text-black tracking-tight mb-4">
+              Life at BeatMusic
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                <h4 className="font-bold text-black text-base mb-1">Flexible Hybrid Model</h4>
+                <p className="text-zinc-600 text-xs leading-relaxed">
+                  Work from an office, from home, or anywhere that inspires your best creativity.
+                </p>
               </div>
-            ))}
+              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                <h4 className="font-bold text-black text-base mb-1">Health & Wellness</h4>
+                <p className="text-zinc-600 text-xs leading-relaxed">
+                  Comprehensive global medical, dental, and mental wellbeing care for you and your family.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                <h4 className="font-bold text-black text-base mb-1">Free Premium for Life</h4>
+                <p className="text-zinc-600 text-xs leading-relaxed">
+                  All employees and their loved ones enjoy ad-free lossless music and audiobooks for life.
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                <h4 className="font-bold text-black text-base mb-1">Learning & Growth</h4>
+                <p className="text-zinc-600 text-xs leading-relaxed">
+                  Annual educational stipends, conference budgets, and mentorship from industry pioneers.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       );
 
+    /* ================= NEWSROOM ================= */
     case "newsroom":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">For the Record: News & Press</h2>
-            <p className="text-zinc-300 text-sm">Official company statements, product announcements, and updates.</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              For the Record: News & Press
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              The official publication of BeatMusic, featuring the latest stories, company milestones, culture, and product innovations.
+            </p>
           </div>
 
           <div className="space-y-4">
@@ -318,19 +426,19 @@ function renderContent(slug: string) {
               },
               {
                 date: "September 2026",
-                title: "Empowering 50,000 Indie Artists with Direct Micro-Tipping",
-                desc: "Fans can now support their favorite musicians in real-time right from the playback view.",
+                title: "Global Paying Subscribers Exceed 150 Million Milestone",
+                desc: "Rapid international growth driven by mobile enhancements and local catalog expansions across 180+ regions.",
               },
               {
                 date: "August 2026",
-                title: "Global Reach Expands Across 25 New Streaming Markets",
-                desc: "Localized music catalogs, regional charts, and podcasts now live for over 100M new listeners.",
+                title: "BeatMusic Partners with Indie Artists Alliance for Fair Royalties",
+                desc: "Introducing transparent real-time revenue splitting and zero-fee community upload tools.",
               },
-            ].map((news) => (
-              <div key={news.title} className="p-4 rounded-xl bg-zinc-900 border border-white/5 space-y-1">
-                <span className="text-[11px] font-bold text-[#863bff] uppercase tracking-wider">{news.date}</span>
-                <h3 className="font-bold text-white text-base">{news.title}</h3>
-                <p className="text-xs text-zinc-400 leading-relaxed">{news.desc}</p>
+            ].map((article) => (
+              <div key={article.title} className="p-5 rounded-xl border border-zinc-200 hover:border-black transition-colors group">
+                <span className="text-xs font-bold text-[#1db954]">{article.date}</span>
+                <h3 className="font-bold text-black text-lg mt-1 group-hover:text-[#1db954] transition-colors">{article.title}</h3>
+                <p className="text-sm text-zinc-600 mt-2 leading-relaxed">{article.desc}</p>
               </div>
             ))}
           </div>
@@ -340,31 +448,39 @@ function renderContent(slug: string) {
     /* ================= COMMUNITIES ================= */
     case "for-artists":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic for Artists</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Claim your official artist profile, reach millions of fans worldwide, pitch directly to our editorial playlist curators, and track real-time stream stats.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              BeatMusic for Artists
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Everything you need to develop your fanbase, build a business, and create the world around your music.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-5 rounded-xl bg-zinc-900 border border-white/10 space-y-2">
-              <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-emerald-400" />
-                Artist Verification & Badge
-              </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                Get the blue verified checkmark on your artist page to show listeners your music is official.
+            <div className="p-5 rounded-xl border border-zinc-200 hover:border-black transition-colors">
+              <h3 className="font-bold text-black text-lg mb-1">Claim Your Artist Profile</h3>
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                Add your bio, tour dates, custom header images, and artist pick tracks visible to millions of fans.
               </p>
             </div>
-            <div className="p-5 rounded-xl bg-zinc-900 border border-white/10 space-y-2">
-              <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-emerald-400" />
-                Real-Time Audience Analytics
-              </h3>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                See who is listening right now, where your biggest listener base lives, and which songs are trending.
+            <div className="p-5 rounded-xl border border-zinc-200 hover:border-black transition-colors">
+              <h3 className="font-bold text-black text-lg mb-1">Real-Time Audience Analytics</h3>
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                Track live listener counts, playlist inclusions, top demographics, and streaming royalties on desktop & mobile.
+              </p>
+            </div>
+            <div className="p-5 rounded-xl border border-zinc-200 hover:border-black transition-colors">
+              <h3 className="font-bold text-black text-lg mb-1">Direct Playlist Pitching</h3>
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                Submit unreleased tracks directly to our global editorial curation teams before release day.
+              </p>
+            </div>
+            <div className="p-5 rounded-xl border border-zinc-200 hover:border-black transition-colors">
+              <h3 className="font-bold text-black text-lg mb-1">Canvas Video Loops</h3>
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                Add short 8-second visual loops to replace album artwork on playback, boosting track shares by 145%.
               </p>
             </div>
           </div>
@@ -373,39 +489,57 @@ function renderContent(slug: string) {
 
     case "for-creators":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic for Creators</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Integrate licensed soundtrack music into your streams, videos, and podcasts with 100% copyright clearance and zero strikes.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              BeatMusic for Creators
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Tools and revenue models built specifically for audio producers, sound designers, and content creators.
             </p>
           </div>
-          <div className="p-5 rounded-xl bg-purple-950/30 border border-purple-500/30">
-            <h3 className="text-white font-bold text-sm mb-2">Creator Royalty Share Program</h3>
-            <p className="text-xs text-zinc-300 leading-relaxed">
-              Earn affiliate royalties whenever your subscribers listen to your curated playlists on BeatMusic.
-            </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">BeatMaster Cloud Studio</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Collaborate remotely on multi-track audio stems with lossless real-time synchronization.
+              </p>
+            </div>
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">Stem Separation AI</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Extract vocals, drums, bass, and melody lines in seconds using our integrated neural audio isolation tool.
+              </p>
+            </div>
           </div>
         </div>
       );
 
     case "for-podcasters":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic for Podcasters</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              BeatMusic for Podcasters
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
               Distribute your episodes via RSS, upload full video podcasts in 4K, and monetize with dynamic audio ads.
             </p>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Video Podcast Support</h4>
-              <p className="text-xs text-zinc-400 mt-1">Direct upload with automatic chapter markers and synchronized captions.</p>
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">Video Podcast Support</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Direct upload with automatic chapter markers, thumbnail selection, and synchronized captions.
+              </p>
             </div>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Interactive Polls & Q&A</h4>
-              <p className="text-xs text-zinc-400 mt-1">Engage your audience directly during podcast playback.</p>
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">Interactive Polls & Q&A</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Engage your audience directly inside the playback window while episodes are streaming.
+              </p>
             </div>
           </div>
         </div>
@@ -413,43 +547,63 @@ function renderContent(slug: string) {
 
     case "for-developers":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Developer Platform & Web API</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Build audio experiences, smart speaker integrations, and playlist automation using our modern REST API and Web Playback SDK.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Developer Platform & Web API
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Build rich audio applications, smart speaker integrations, and playlist automation tools using our REST API and Web Playback SDK.
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-zinc-950 border border-zinc-800 font-mono text-xs text-zinc-300 overflow-x-auto">
-            <p className="text-zinc-500">// Example: Fetch Trending Songs</p>
-            <p className="text-purple-400">curl -X GET https://api.beatmusic.com/v1/songs/trending \</p>
-            <p className="pl-4 text-emerald-400">-H "Authorization: Bearer YOUR_API_TOKEN"</p>
+          <div className="p-5 rounded-xl bg-zinc-900 text-zinc-100 font-mono text-xs overflow-x-auto space-y-1">
+            <p className="text-zinc-400">// Example: Fetch Trending Songs via REST</p>
+            <p className="text-emerald-400">curl -X GET https://api.beatmusic.com/v1/songs/trending \</p>
+            <p className="pl-4 text-purple-300">-H "Authorization: Bearer YOUR_API_TOKEN"</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">Web Playback SDK</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Control playback and stream full audio directly inside client-side web apps.
+              </p>
+            </div>
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">REST API v2</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Comprehensive endpoints for catalog search, playlist management, user library, and lyrics sync.
+              </p>
+            </div>
           </div>
         </div>
       );
 
     case "advertising":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Advertising on BeatMusic</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Connect with engaged listeners when their attention is at its peak. Audio ads, sponsored playlists, and video takeovers.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Advertising on BeatMusic
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Reach engaged listeners in screenless moments. Audio storytelling with guaranteed delivery and demographic precision.
             </p>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10 text-center">
-              <h4 className="font-bold text-white text-sm">Audio Ads</h4>
-              <p className="text-xs text-zinc-400 mt-1">Between-song immersive audio storytelling.</p>
+            <div className="p-5 rounded-xl border border-zinc-200 text-center">
+              <h3 className="font-bold text-black text-base mb-1">Audio Ads</h3>
+              <p className="text-xs text-zinc-600">30-second non-skippable audio spots between tracks.</p>
             </div>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10 text-center">
-              <h4 className="font-bold text-white text-sm">Sponsored Sessions</h4>
-              <p className="text-xs text-zinc-400 mt-1">Provide 30 minutes of ad-free listening.</p>
+            <div className="p-5 rounded-xl border border-zinc-200 text-center">
+              <h3 className="font-bold text-black text-base mb-1">Sponsored Sessions</h3>
+              <p className="text-xs text-zinc-600">Offer 30 minutes of ad-free listening sponsored by your brand.</p>
             </div>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10 text-center">
-              <h4 className="font-bold text-white text-sm">Homepage Takeover</h4>
-              <p className="text-xs text-zinc-400 mt-1">Maximum visibility on prime real estate.</p>
+            <div className="p-5 rounded-xl border border-zinc-200 text-center">
+              <h3 className="font-bold text-black text-base mb-1">Display Takeover</h3>
+              <p className="text-xs text-zinc-600">High-impact visual banners on desktop and mobile web player.</p>
             </div>
           </div>
         </div>
@@ -457,17 +611,20 @@ function renderContent(slug: string) {
 
     case "investors":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Investor Relations</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Financial results, annual reports, shareholder information, and corporate governance for BeatMusic.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Investor Relations
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Financial results, annual reports, shareholder information, and corporate governance for BeatMusic AB.
             </p>
           </div>
-          <div className="p-5 rounded-xl bg-zinc-900 border border-white/10 space-y-3">
-            <h4 className="font-bold text-white text-sm">Quarterly Earnings & Presentations</h4>
-            <p className="text-xs text-zinc-400">
-              Q3 2026 Earnings Release: Streaming revenue up 34% YoY, global paying subscriber count surpasses 150 Million.
+
+          <div className="p-5 rounded-xl border border-zinc-200 space-y-2">
+            <h3 className="font-bold text-black text-base">Q3 2026 Earnings Release</h3>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              Global revenue increased 34% year-over-year. Paying subscriber count surpasses 150 million globally.
             </p>
           </div>
         </div>
@@ -475,17 +632,20 @@ function renderContent(slug: string) {
 
     case "vendors":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Vendor & Supplier Portal</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Guidelines, code of conduct, procurement standards, and invoicing portal for external partners and suppliers.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Vendor & Supplier Portal
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Procurement policies, ethical guidelines, and supplier registration for global BeatMusic partners.
             </p>
           </div>
-          <div className="p-5 rounded-xl bg-zinc-900 border border-white/10">
-            <h4 className="font-bold text-white text-sm">Supplier Code of Conduct</h4>
-            <p className="text-xs text-zinc-400 mt-1">
-              We uphold the highest ethical, social, and environmental standards across all supplier relationships.
+
+          <div className="p-5 rounded-xl border border-zinc-200">
+            <h3 className="font-bold text-black text-base mb-1">Supplier Code of Conduct</h3>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              We require all vendors and commercial partners to adhere strictly to our standards of sustainability and fair labor.
             </p>
           </div>
         </div>
@@ -494,52 +654,84 @@ function renderContent(slug: string) {
     /* ================= USEFUL LINKS ================= */
     case "support":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Help & Customer Support</h2>
-            <p className="text-zinc-300 text-sm">Find quick answers, contact customer care, or troubleshoot your playback.</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Customer Service and Support
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Quick answers, billing support, and troubleshooting for your playback on all devices.
+            </p>
           </div>
 
           <div className="space-y-3">
             {[
-              { q: "How do I download music for offline listening?", a: "With Premium, click the download icon next to any song or album to listen offline anywhere." },
-              { q: "How do I upgrade to Premium Platinum?", a: "Visit your Account Settings or the BeatMusic Plans page and choose Platinum for lossless Hi-Fi audio." },
+              { q: "How do I download music for offline listening?", a: "With Premium, click the download icon next to any song, album, or playlist to listen offline." },
+              { q: "How do I upgrade to Premium Platinum?", a: "Visit your Account Settings or the BeatMusic Plans page and choose Platinum for lossless 24-bit/192kHz Hi-Fi audio." },
               { q: "Can I transfer playlists from Spotify or Apple Music?", a: "Yes! Use our 'Import your music' tool in the Useful Links section to sync your playlists in 1 click." },
-              { q: "How do I update my profile picture or account name?", a: "Go to your Profile page by clicking your avatar in the top-right corner to manage your details." },
+              { q: "How do I update my profile picture or account name?", a: "Click on your profile avatar in the navigation bar to update your display name and photo." },
             ].map((faq) => (
-              <div key={faq.q} className="p-4 rounded-xl bg-zinc-900 border border-white/5 space-y-1">
-                <h4 className="font-bold text-white text-sm">{faq.q}</h4>
-                <p className="text-xs text-zinc-400">{faq.a}</p>
+              <div key={faq.q} className="p-4 rounded-xl border border-zinc-200 space-y-1">
+                <h4 className="font-bold text-black text-sm">{faq.q}</h4>
+                <p className="text-xs text-zinc-600 leading-relaxed">{faq.a}</p>
               </div>
             ))}
+          </div>
+
+          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+            <h4 className="font-bold text-black text-sm mb-1">Still need help?</h4>
+            <p className="text-xs text-zinc-600">
+              Email our support team directly at{" "}
+              <a href="mailto:support@beatmusic.com" className="text-[#1db954] font-bold hover:underline">
+                support@beatmusic.com
+              </a>
+              . We respond within 24 hours.
+            </p>
           </div>
         </div>
       );
 
     case "download":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Download the BeatMusic Mobile App</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Take your music anywhere. Seamless playback on iOS, Android, macOS, Windows, and smartwatch devices.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Download BeatMusic
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Play millions of songs and podcasts on your device. Free on iOS, Android, Mac, and Windows.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-4 pt-2">
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10 flex items-center gap-3">
-              <Smartphone className="size-8 text-purple-400" />
-              <div>
-                <p className="text-xs text-zinc-400">Download for</p>
-                <p className="font-bold text-white text-sm">iOS (App Store)</p>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-6 rounded-2xl border border-zinc-200 space-y-3">
+              <Laptop className="size-8 text-[#1db954]" />
+              <h3 className="font-bold text-black text-lg">Desktop App (Mac & Windows)</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Enjoy offline storage, keyboard hotkeys, and lossless audio streaming directly on your PC or Mac.
+              </p>
+              <button
+                type="button"
+                onClick={() => alert("Downloading BeatMusic Desktop Installer...")}
+                className="px-5 py-2.5 rounded-full bg-black text-white hover:bg-[#1db954] hover:text-black font-bold text-xs transition-colors"
+              >
+                Download for Desktop
+              </button>
             </div>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10 flex items-center gap-3">
-              <Smartphone className="size-8 text-emerald-400" />
-              <div>
-                <p className="text-xs text-zinc-400">Download for</p>
-                <p className="font-bold text-white text-sm">Android (Google Play)</p>
-              </div>
+
+            <div className="p-6 rounded-2xl border border-zinc-200 space-y-3">
+              <Smartphone className="size-8 text-[#1db954]" />
+              <h3 className="font-bold text-black text-lg">Mobile App (iOS & Android)</h3>
+              <p className="text-xs text-zinc-600 leading-relaxed">
+                Stream on the go, download songs for the road, and connect to CarPlay and Bluetooth speakers.
+              </p>
+              <button
+                type="button"
+                onClick={() => alert("Opening App Store / Google Play...")}
+                className="px-5 py-2.5 rounded-full bg-black text-white hover:bg-[#1db954] hover:text-black font-bold text-xs transition-colors"
+              >
+                Get Mobile App
+              </button>
             </div>
           </div>
         </div>
@@ -547,36 +739,44 @@ function renderContent(slug: string) {
 
     case "charts":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Popular by Country & Global Charts</h2>
-            <p className="text-zinc-300 text-sm">Explore what's topping the charts across 180+ countries right now.</p>
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Popular by Country & Charts
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Discover what the world is listening to right now with daily updated charts across 180+ regions.
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {["United States", "United Kingdom", "India", "Germany", "Japan", "Brazil", "Canada", "Australia"].map((c) => (
-              <div key={c} className="p-3 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white">{c}</span>
-                <span className="text-[10px] text-purple-400 font-bold">Top 50</span>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">Top 50 - Global</h3>
+              <p className="text-xs text-zinc-600">The most played tracks in the world, updated every morning.</p>
+            </div>
+            <div className="p-5 rounded-xl border border-zinc-200">
+              <h3 className="font-bold text-black text-base mb-1">Viral 50 - Global</h3>
+              <p className="text-xs text-zinc-600">The most shared and trending new music right now.</p>
+            </div>
           </div>
         </div>
       );
 
     case "lyrics":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Top Song Lyrics & Sing-Along Mode</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              Read and sing along with real-time synchronized lyrics on every track. Verified by official publishers and artist communities.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Top Song Lyrics
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Sing along with synchronized real-time lyrics on every track. Powered by Musixmatch.
             </p>
           </div>
-          <div className="p-5 rounded-xl bg-zinc-900 border border-white/10 space-y-2">
-            <h4 className="font-bold text-white text-sm">Interactive Karaoke Mode</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Adjust vocal levels on supported tracks and follow the word-by-word highlighted playback on any device.
+
+          <div className="p-5 rounded-xl bg-zinc-50 border border-zinc-200">
+            <p className="text-sm text-zinc-700 leading-relaxed italic">
+              "Lyrics scroll seamlessly with the music so you never miss a word. Available on desktop, mobile, and web."
             </p>
           </div>
         </div>
@@ -584,24 +784,27 @@ function renderContent(slug: string) {
 
     case "import":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Import Your Music & Playlists</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              Import Your Music
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
               Seamlessly bring your existing favorites from Spotify, Apple Music, YouTube Music, or Amazon Music to BeatMusic in minutes.
             </p>
           </div>
-          <div className="p-6 rounded-2xl bg-gradient-to-r from-purple-900/30 to-zinc-900 border border-purple-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h4 className="font-bold text-white text-base">One-Click Playlist Sync</h4>
-              <p className="text-xs text-zinc-300 mt-1">Upload a .csv, .m3u, or connect your streaming account.</p>
-            </div>
+
+          <div className="p-6 rounded-2xl border border-zinc-200 space-y-4">
+            <h3 className="font-bold text-black text-lg">1-Click Playlist Migration</h3>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              Connect your external streaming account and our synchronization engine will automatically reconstruct your playlists and saved albums.
+            </p>
             <button
               type="button"
-              onClick={() => alert("Playlist import tool initiated!")}
-              className="px-5 py-2.5 rounded-full bg-[#863bff] hover:bg-[#722ed1] text-white text-xs font-bold transition-all whitespace-nowrap shadow-lg shadow-purple-600/30"
+              onClick={() => alert("Launching 1-Click Music Importer...")}
+              className="px-5 py-2.5 rounded-full bg-[#1db954] text-black font-bold text-xs hover:scale-105 transition-transform"
             >
-              Start Import
+              Start Sync Now
             </button>
           </div>
         </div>
@@ -609,267 +812,84 @@ function renderContent(slug: string) {
 
     /* ================= PLANS ================= */
     case "premium":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Premium Standard</h2>
-            <p className="text-zinc-300 text-sm">Ad-free music listening, offline downloads, and unlimited skips.</p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-purple-900/40 via-zinc-900 to-black border-2 border-[#863bff] space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-300">Individual Plan</span>
-                <h3 className="text-2xl font-black text-white">$9.99 / month</h3>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-[#863bff] text-white text-xs font-bold">1 Month Free</span>
-            </div>
-            <ul className="space-y-2 text-xs text-zinc-300 pt-2 border-t border-white/10">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-emerald-400" />
-                Ad-free music listening on all devices
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-emerald-400" />
-                Download to listen offline anywhere
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-emerald-400" />
-                Play any song on demand with unlimited skips
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-emerald-400" />
-                High audio quality (320kbps AAC)
-              </li>
-            </ul>
-            <button
-              type="button"
-              onClick={() => alert("Subscribed to Premium Standard!")}
-              className="w-full py-3 rounded-full bg-white text-black font-bold text-xs hover:bg-zinc-200 transition-colors shadow-lg"
-            >
-              Get Premium Standard
-            </button>
-          </div>
-        </div>
-      );
-
     case "premium-platinum":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Premium Platinum (Hi-Fi)</h2>
-            <p className="text-zinc-300 text-sm">24-bit / 192kHz Lossless FLAC, Spatial Audio, and up to 6 family accounts.</p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-950/40 via-zinc-900 to-black border-2 border-amber-500/60 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-300">Hi-Fi Audiophile Tier</span>
-                <h3 className="text-2xl font-black text-white">$14.99 / month</h3>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-amber-500 text-black text-xs font-black">Ultra HD</span>
-            </div>
-            <ul className="space-y-2 text-xs text-zinc-300 pt-2 border-t border-white/10">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-amber-400" />
-                Pure Studio Master Lossless FLAC (up to 24-bit, 192 kHz)
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-amber-400" />
-                Dolby Atmos & 3D Spatial Audio soundscapes
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-amber-400" />
-                6 Separate Premium accounts for family members
-              </li>
-            </ul>
-            <button
-              type="button"
-              onClick={() => alert("Subscribed to Platinum!")}
-              className="w-full py-3 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 text-black font-extrabold text-xs hover:opacity-95 transition-opacity shadow-lg"
-            >
-              Get Premium Platinum
-            </button>
-          </div>
-        </div>
-      );
-
     case "premium-student":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Premium Student</h2>
-            <p className="text-zinc-300 text-sm">50% discount for eligible university and college students.</p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-zinc-900 to-black border border-emerald-500/40 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">Student Discount</span>
-                <h3 className="text-2xl font-black text-white">$4.99 / month</h3>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-emerald-500 text-black text-xs font-bold">50% OFF</span>
-            </div>
-            <p className="text-xs text-zinc-400">All the full features of Premium Standard at half the price.</p>
-            <button
-              type="button"
-              onClick={() => alert("Verify student status")}
-              className="w-full py-3 rounded-full bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-colors"
-            >
-              Verify Student Status & Subscribe
-            </button>
-          </div>
-        </div>
-      );
-
     case "free":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Free Plan</h2>
-            <p className="text-zinc-300 text-sm">Stream millions of tracks on shuffle with occasional ad breaks.</p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-zinc-900 border border-white/10 space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-zinc-400">Free Tier</span>
-                <h3 className="text-2xl font-black text-white">$0.00 / forever</h3>
-              </div>
-              <span className="px-3 py-1 rounded-full bg-zinc-800 text-zinc-300 text-xs font-bold">Current Plan</span>
-            </div>
-            <ul className="space-y-2 text-xs text-zinc-300 pt-2 border-t border-white/10">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-zinc-400" />
-                Access to over 100M+ songs and podcast episodes
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="size-4 text-zinc-400" />
-                Create and share custom playlists
-              </li>
-            </ul>
-          </div>
-        </div>
-      );
-
-    /* ================= LEGAL ================= */
-    case "legal":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Terms and Conditions of Use</h2>
-            <p className="text-xs text-zinc-400">Last updated: October 2026</p>
-          </div>
-          <div className="space-y-4 text-xs text-zinc-300 leading-relaxed">
-            <p>
-              Welcome to BeatMusic. By signing up, accessing, or using the BeatMusic service, websites, or software applications,
-              you enter into a binding contract with BeatMusic Inc.
-            </p>
-            <h4 className="font-bold text-white text-sm">1. Service Limitations and Modifications</h4>
-            <p>
-              We will make reasonable efforts to keep the BeatMusic service operational. However, technical difficulties or maintenance
-              may occasionally cause temporary interruptions.
-            </p>
-            <h4 className="font-bold text-white text-sm">2. User Guidelines</h4>
-            <p>
-              BeatMusic respects intellectual property rights and expects you to do the same. You may not copy, redistribute, reproduce,
-              or record any audio content made available via the platform.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              BeatMusic Plans & Pricing
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Choose the plan that fits your listening life. Ad-free music, offline listening, and uncompressed high-fidelity audio.
             </p>
           </div>
-        </div>
-      );
 
-    case "safety":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Safety & Privacy Center</h2>
-            <p className="text-zinc-300 text-sm">Your security, account safety, and privacy controls in one place.</p>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Two-Factor Authentication (2FA)</h4>
-              <p className="text-xs text-zinc-400 mt-1">Protect your account from unauthorized logins with 2FA verification.</p>
+            <div className="p-6 rounded-2xl border border-zinc-200 space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1db954]">Free</span>
+              <h3 className="font-bold text-black text-xl">$0 / month</h3>
+              <p className="text-xs text-zinc-600">Shuffle play, ad-supported streaming, standard audio quality.</p>
             </div>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Report Inappropriate Content</h4>
-              <p className="text-xs text-zinc-400 mt-1">Flag any offensive, abusive, or copyright-infringing material instantly.</p>
+            <div className="p-6 rounded-2xl border-2 border-black space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#1db954]">Premium Individual</span>
+              <h3 className="font-bold text-black text-xl">$10.99 / month</h3>
+              <p className="text-xs text-zinc-600">Ad-free music listening, offline downloads, unlimited skips, high quality audio.</p>
+              <button
+                type="button"
+                onClick={() => alert("Redirecting to Premium Checkout...")}
+                className="w-full py-2.5 rounded-full bg-black text-white hover:bg-[#1db954] hover:text-black font-bold text-xs transition-colors"
+              >
+                Get Premium
+              </button>
             </div>
           </div>
         </div>
       );
 
+    /* ================= LEGAL & PRIVACY ================= */
+    case "legal":
+    case "safety":
     case "privacy":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">BeatMusic Privacy Policy</h2>
-            <p className="text-xs text-zinc-400">Commitment to transparency and data privacy</p>
-          </div>
-          <div className="space-y-3 text-xs text-zinc-300 leading-relaxed">
-            <p>
-              This Privacy Policy explains how we collect, store, share, and protect your personal data when you interact with our audio streaming service.
-            </p>
-            <h4 className="font-bold text-white text-sm">Information We Collect</h4>
-            <p>
-              We collect information you provide directly to us (such as email, name, and playlist selections), as well as automated device telemetry and playback history.
-            </p>
-          </div>
-        </div>
-      );
-
     case "cookies":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Cookie & Tracking Policy</h2>
-            <p className="text-zinc-300 text-sm">How we use cookies to deliver and improve your music experience.</p>
-          </div>
-          <div className="space-y-3 text-xs text-zinc-300 leading-relaxed">
-            <p>
-              Cookies are small text files stored on your device that help remember your volume settings, active device playback session, and authentication tokens.
-            </p>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Essential Cookies</h4>
-              <p className="text-xs text-zinc-400 mt-1">Required for authentication, security, and continuous playback.</p>
-            </div>
-          </div>
-        </div>
-      );
-
     case "ads":
-      return (
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-2">About Ads on BeatMusic</h2>
-            <p className="text-zinc-300 text-sm">Learn how tailored advertising helps support free music streaming.</p>
-          </div>
-          <div className="space-y-3 text-xs text-zinc-300 leading-relaxed">
-            <p>
-              Our free listening experience is supported by advertising partners. You can adjust your personalization preferences at any time in Account Settings.
-            </p>
-          </div>
-        </div>
-      );
-
     case "accessibility":
       return (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Accessibility at BeatMusic</h2>
-            <p className="text-zinc-300 text-sm leading-relaxed">
-              We believe music is for everyone. We design our platforms to be accessible to people of all abilities.
+            <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight mb-4">
+              {slug === "safety"
+                ? "Safety & Privacy Center"
+                : slug === "privacy"
+                ? "Privacy Policy"
+                : slug === "cookies"
+                ? "Cookie Policy"
+                : slug === "ads"
+                ? "About Ads on BeatMusic"
+                : slug === "accessibility"
+                ? "Accessibility at BeatMusic"
+                : "Legal Terms & Conditions"}
+            </h1>
+            <p className="text-zinc-700 text-[15px] sm:text-[16px] leading-[1.65]">
+              Last updated: October 2026. These terms govern your use of the BeatMusic streaming platform and services.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Screen Reader Support</h4>
-              <p className="text-xs text-zinc-400 mt-1">Full semantic ARIA labels on all playback controls and navigation menus.</p>
-            </div>
-            <div className="p-4 rounded-xl bg-zinc-900 border border-white/10">
-              <h4 className="font-bold text-white text-sm">Keyboard Navigation</h4>
-              <p className="text-xs text-zinc-400 mt-1">Full keyboard shortcut coverage for play, pause, skip, and volume control.</p>
-            </div>
+
+          <div className="space-y-4 text-sm text-zinc-700 leading-relaxed">
+            <p>
+              At BeatMusic, we believe transparency and data protection are fundamental rights. We never sell your personal information to third parties.
+            </p>
+            <p>
+              All audio streams are secured end-to-end, and your personal playback habits are encrypted with AES-256 standards.
+            </p>
+            <p>
+              For legal inquiries, copyright notices (DMCA), or privacy inquiries, contact our Legal Department at{" "}
+              <a href="mailto:legal@beatmusic.com" className="text-[#1db954] font-bold hover:underline">
+                legal@beatmusic.com
+              </a>
+              .
+            </p>
           </div>
         </div>
       );
@@ -877,8 +897,11 @@ function renderContent(slug: string) {
     default:
       return (
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white">Topic Not Found</h2>
-          <p className="text-sm text-zinc-400">Please choose a topic from the menu on the left.</p>
+          <h1 className="text-4xl font-black text-black">Page Not Found</h1>
+          <p className="text-zinc-600 text-sm">Please choose a topic from the footer or return home.</p>
+          <Link to="/home" className="inline-block px-5 py-2.5 rounded-full bg-black text-white text-xs font-bold hover:bg-[#1db954] hover:text-black transition-colors">
+            Return to Home
+          </Link>
         </div>
       );
   }

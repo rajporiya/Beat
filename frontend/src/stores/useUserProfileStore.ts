@@ -22,6 +22,7 @@ interface UserProfileStore {
   syncProfile: (clerkData: { firstName?: string | null; lastName?: string | null; imageUrl?: string; email?: string | null }) => Promise<boolean>;
   updateProfile: (data: { fullName?: string; email?: string }) => Promise<boolean>;
   uploadAvatar: (file: File) => Promise<boolean>;
+  logout: () => Promise<boolean>;
   setProfile: (profile: Profile | null) => void;
 }
 
@@ -97,6 +98,19 @@ export const useUserProfileStore = create<UserProfileStore>((set) => ({
       return false;
     } finally {
       set({ isUploadingAvatar: false });
+    }
+  },
+
+  // POST /user/logout — end the session server-side, then clear local state.
+  // The Clerk session itself is ended in the component via clerk.signOut().
+  logout: async () => {
+    try {
+      await axiosInstance.post("/user/logout");
+      return true;
+    } catch {
+      return false;
+    } finally {
+      set({ profile: null, error: null });
     }
   },
 

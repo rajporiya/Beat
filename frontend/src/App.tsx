@@ -37,6 +37,8 @@ const App = () => {
         <Route path="/register" element={<AuthPage mode="register"/>}/>
         <Route path="/about" element={<AboutPage />}/>
         <Route path="/info/about" element={<AboutPage />}/>
+        <Route path="/info" element={<InfoPage />}/>
+        <Route path="/info/:slug" element={<InfoPage />}/>
         
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/home" replace />}/>
@@ -49,8 +51,6 @@ const App = () => {
           <Route path="/playlist/:playlistId" element={<CollectionPage type="liked" />}/>          <Route path="/chat" element={<ChatPage />}/>
           <Route path="/album/:albumId" element={<AlbumPage />}/>
           <Route path="/profile" element={<ProfilePage />}/>
-          <Route path="/info" element={<InfoPage />}/>
-          <Route path="/info/:slug" element={<InfoPage />}/>
         </Route>
        </Routes>
       </>
