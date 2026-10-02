@@ -90,7 +90,14 @@ return (
                         </Link>
                         ))
                     )}
-                    <footer className='hidden md:flex flex-wrap gap-x-4 gap-y-2 px-1 pt-8 text-[11px] text-zinc-400'><span>Legal</span><span>Safety &amp; Privacy Center</span><span>Privacy Policy</span><span>Cookies</span><span>About Ads</span><span>Accessibility</span></footer>
+                    <footer className='hidden md:flex flex-wrap gap-x-4 gap-y-2 px-1 pt-8 text-[11px] text-zinc-400'>
+                        <a href="/info/legal" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Legal</a>
+                        <a href="/info/safety" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Safety &amp; Privacy Center</a>
+                        <a href="/info/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Privacy Policy</a>
+                        <a href="/info/cookies" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Cookies</a>
+                        <a href="/info/ads" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">About Ads</a>
+                        <a href="/info/accessibility" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline transition-colors">Accessibility</a>
+                    </footer>
                 </div>
             </ScrollArea>
         </div>

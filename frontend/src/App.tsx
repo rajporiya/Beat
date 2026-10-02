@@ -13,6 +13,8 @@ import CollectionPage from "./pages/CollectionPage"
 import ArtistPage from "./pages/ArtistPage"
 import AuthPage from "./pages/AuthPage"
 import ProfilePage from "./pages/ProfilePage"
+import InfoPage from "./pages/InfoPage"
+import AboutPage from "./pages/AboutPage"
 import AdminSongsPage from "./pages/admin/AdminSongsPage"
 import AdminAlbumsPage from "./pages/admin/AdminAlbumsPage"
 import AdminArtistsPage from "./pages/admin/AdminArtistsPage"
@@ -33,6 +35,8 @@ const App = () => {
 
         <Route path="/login" element={<AuthPage mode="login"/>}/>
         <Route path="/register" element={<AuthPage mode="register"/>}/>
+        <Route path="/about" element={<AboutPage />}/>
+        <Route path="/info/about" element={<AboutPage />}/>
         
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/home" replace />}/>
@@ -45,6 +49,8 @@ const App = () => {
           <Route path="/playlist/:playlistId" element={<CollectionPage type="liked" />}/>          <Route path="/chat" element={<ChatPage />}/>
           <Route path="/album/:albumId" element={<AlbumPage />}/>
           <Route path="/profile" element={<ProfilePage />}/>
+          <Route path="/info" element={<InfoPage />}/>
+          <Route path="/info/:slug" element={<InfoPage />}/>
         </Route>
        </Routes>
       </>
