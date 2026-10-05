@@ -1,15 +1,16 @@
 import { User } from "../models/user.models.js";
 import cloudinary from "../lib/cludinary.js";
-import { getAuth } from "@clerk/express";
 
-const getUserId = (req) => req.auth?.userId || getAuth(req)?.userId;
+const getUserId = (req) => req.user?._id?.toString() || req.auth?.userId;
 
 const placeholderEmail = (clerkUserId) => `clerk_${clerkUserId}@unknown.local`;
 
-// Create or sync the local user record from client-provided Clerk data.
-// Existing records never overwrite custom user avatars or names.
+// Create or sync the local user record from client-provided Clerk data (fallback).
 const upsertFromClerkSnapshot = async (clerkUserId, { fullName, imageUrl, email } = {}) => {
-    let user = await User.findOne({ clerkId: clerkUserId }).select("-password");
+    let user = await User.findOne({
+        $or: [{ clerkId: clerkUserId }, { _id: clerkUserId?.match(/^[0-9a-fA-F]{24}$/) ? clerkUserId : null }]
+    }).select("-password");
+
     if (user) {
         let changed = false;
         if (!user.imageUrl && imageUrl) {
@@ -46,8 +47,6 @@ const upsertFromClerkSnapshot = async (clerkUserId, { fullName, imageUrl, email 
     try {
         return await attempt(setOnInsert);
     } catch (upsertError) {
-        // The email may already belong to an older record — retry with a placeholder
-        // email so the account still gets created
         if (upsertError?.code === 11000) {
             return attempt({ ...setOnInsert, email: placeholderEmail(clerkUserId) });
         }
@@ -55,27 +54,31 @@ const upsertFromClerkSnapshot = async (clerkUserId, { fullName, imageUrl, email 
     }
 };
 
-// Look up the local record for the current Clerk session. Does NOT create —
-// creation happens in /sync, which receives the real Clerk profile data.
-const findCurrentUser = (clerkUserId) =>
-    User.findOne({ clerkId: clerkUserId }).select("-password");
+const findCurrentUser = async (userId) => {
+    if (!userId) return null;
+    if (userId.match?.(/^[0-9a-fA-F]{24}$/)) {
+        const found = await User.findById(userId).select("-password");
+        if (found) return found;
+    }
+    return User.findOne({ clerkId: userId }).select("-password");
+};
 
-export const getAllUsers = async (req, res, next ) => {
+export const getAllUsers = async (req, res, next) => {
     try {
-        const currentUser = getUserId(req);
-        const users = await User.find({ clerkId : { $ne : currentUser}});
+        const currentUserId = getUserId(req);
+        const users = await User.find({
+            _id: { $ne: currentUserId }
+        }).select("-password");
         res.status(200).json(users);
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
 
-// POST /api/user/logout — end the session server-side.
-// Session tokens live in the `__session` cookie (Clerk), so clear it.
 export const logoutUser = async (req, res, next) => {
     try {
+        res.clearCookie("token");
         res.clearCookie("__session");
-        res.clearCookie("__client", { path: "/" });
         res.status(200).json({ success: true, message: "Logged out successfully" });
     } catch (error) {
         next(error);

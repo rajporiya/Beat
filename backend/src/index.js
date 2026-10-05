@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from 'express'
 import dotenv from 'dotenv'
-import { clerkMiddleware} from '@clerk/express'
 import userRoutes from './routes/user.route.js'
 import adminRoute from './routes/admin.route.js'
 import authRoutes from './routes/auth.route.js'
@@ -29,7 +28,6 @@ app.use(
 
 app.use(express.json())
 app.use(cookieParser())
-app.use(clerkMiddleware())
 
 app.use(fileUpload({
     useTempFiles : true,

@@ -2,7 +2,7 @@ import MediaCard from "@/components/music/MediaCard";
 import CreateUserAlbumModal from "@/components/CreateUserAlbumModal";
 import { getFallbackArtwork } from "@/lib/songArtwork";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SignedIn } from "@clerk/clerk-react";
+import { SignedIn } from "@/providers/AuthProvider";
 import { useMusicStore } from "@/stores/useMusicStore";
 import { Disc3, Plus } from "lucide-react";
 import { useEffect, useState } from "react";

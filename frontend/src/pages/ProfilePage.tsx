@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { useClerk, useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import { Camera, Loader2, LogOut, Mail, Save, TriangleAlert, User as UserIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUserProfileStore } from "@/stores/useUserProfileStore";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const inputClass =
   "mt-2 w-full rounded-md border border-zinc-600 bg-[#242424] p-3 text-sm text-white outline-none focus:border-[#22c55e] disabled:opacity-60";
@@ -16,13 +17,12 @@ export default function ProfilePage() {
     isUploadingAvatar, 
     error,
     fetchProfile,
-    syncProfile,
     updateProfile,
     uploadAvatar,
-    logout,
+    logout: profileLogout,
   } = useUserProfileStore();
-  const { user: clerkUser } = useUser();
-  const { signOut } = useClerk();
+  const { user, logout: authLogout, setUser } = useAuthStore();
+  const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,32 +32,24 @@ export default function ProfilePage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
 
-  // Load profile; if the backend doesn't know this Clerk user yet,
-  // sync the Clerk data first, then fetch again.
   useEffect(() => {
     const loadProfile = async () => {
       await fetchProfile();
-      if (!useUserProfileStore.getState().profile) {
-        await syncProfile({
-          firstName: clerkUser?.firstName,
-          lastName: clerkUser?.lastName,
-          imageUrl: clerkUser?.imageUrl,
-          email: clerkUser?.primaryEmailAddress?.emailAddress,
-        });
-        await fetchProfile();
-      }
       setLoaded(true);
     };
     void loadProfile();
-  }, [fetchProfile, syncProfile, clerkUser]);
+  }, [fetchProfile]);
 
   // Prefill form when profile arrives
   useEffect(() => {
     if (profile) {
       setFullName(profile.fullName ?? "");
       setEmail(profile.email ?? "");
+    } else if (user) {
+      setFullName(user.fullName ?? "");
+      setEmail(user.email ?? "");
     }
-  }, [profile]);
+  }, [profile, user]);
 
   const isDirty = profile
     ? fullName.trim() !== (profile.fullName ?? "") || email.trim() !== (profile.email ?? "")
@@ -69,15 +61,15 @@ export default function ProfilePage() {
     if (isLoggingOut) return;
     setIsLoggingOut(true);
     try {
-      await logout(); // POST /api/user/logout (clears session cookie server-side)
+      await authLogout();
+      await profileLogout();
     } finally {
-      void signOut({ redirectUrl: "/" }); // ends the Clerk session, back to home
+      navigate("/login");
     }
   };
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    // allow re-selecting the same file later
     event.target.value = "";
     if (!file) return;
 
@@ -94,12 +86,9 @@ export default function ProfilePage() {
     setSuccess(null);
     const ok = await uploadAvatar(file);
     if (ok) {
-      if (clerkUser && typeof (clerkUser as any).setProfileImage === "function") {
-        try {
-          await (clerkUser as any).setProfileImage({ file });
-        } catch (err) {
-          console.warn("Clerk avatar sync skipped:", err);
-        }
+      const updatedProfile = useUserProfileStore.getState().profile;
+      if (updatedProfile && user) {
+        setUser({ ...user, imageUrl: updatedProfile.imageUrl });
       }
       setSuccess("Profile photo updated");
     }
@@ -124,15 +113,8 @@ export default function ProfilePage() {
 
     const ok = await updateProfile({ fullName: name, email: mail });
     if (ok) {
-      if (clerkUser && typeof (clerkUser as any).update === "function") {
-        try {
-          const parts = name.split(" ");
-          const firstName = parts[0] || "";
-          const lastName = parts.slice(1).join(" ") || "";
-          await (clerkUser as any).update({ firstName, lastName });
-        } catch (err) {
-          console.warn("Clerk profile sync skipped:", err);
-        }
+      if (user) {
+        setUser({ ...user, fullName: name, email: mail });
       }
       setSuccess("Profile updated successfully");
     }
@@ -168,10 +150,10 @@ export default function ProfilePage() {
       ?.split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
+      .map((part: string) => part[0]?.toUpperCase())
       .join("") || "U";
 
-  const avatarUrl = profile.imageUrl || clerkUser?.imageUrl;
+  const avatarUrl = profile.imageUrl || user?.imageUrl;
 
   return (
     <div className="mx-auto w-full max-w-2xl overflow-y-auto p-5 sm:p-8">

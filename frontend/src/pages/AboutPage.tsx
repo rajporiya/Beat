@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, useUser } from "@/providers/AuthProvider";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUserProfileStore } from "@/stores/useUserProfileStore";
 
@@ -15,7 +15,7 @@ export const AboutPage: React.FC = () => {
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
+      .map((part: string) => part[0]?.toUpperCase())
       .join("") || "U";
 
   return (

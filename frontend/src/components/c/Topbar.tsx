@@ -3,7 +3,7 @@ import {
   SignedOut,
   useAuth,
   useUser,
-} from "@clerk/clerk-react";
+} from "@/providers/AuthProvider";
 import {
   Bell,
   Home,
@@ -50,7 +50,7 @@ export const Topbar = () => {
       .split(" ")
       .filter(Boolean)
       .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
+      .map((part: string) => part[0]?.toUpperCase())
       .join("") || "U";
 
   return (

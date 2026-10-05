@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@/providers/AuthProvider";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMusicStore } from "@/stores/useMusicStore";

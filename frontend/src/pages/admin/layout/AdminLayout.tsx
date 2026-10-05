@@ -4,7 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useAuthStro } from "@/stores/useAuthStro";
 import { useMusicStore } from "@/stores/useMusicStore";
 import AdminSidebar from "./AdminSidebar";
-import { UserButton } from "@clerk/clerk-react";
+import { UserButton } from "@/providers/AuthProvider";
 
 const pageTitles: Record<string, string> = {
   "/admin": "Dashboard",

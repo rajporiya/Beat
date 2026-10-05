@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useChatStore } from '@/stores/useChatStrore';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '@/providers/AuthProvider';
 import { ChevronRight, HeadphonesIcon, Music, User } from 'lucide-react';
 import { useEffect } from 'react';
 

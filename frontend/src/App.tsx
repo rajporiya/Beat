@@ -1,7 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import HomePage from './pages/HomePage'
-import AuthCallbackPage from './pages/auth-callback/AuthCallbackPage'
-import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react"
 import MainLayout from "./layout/MainLayout"
 import ChatPage from "./pages/ChatPage"
 import AlbumPage from "./pages/home/AlbumPage"
@@ -14,6 +12,7 @@ import ArtistPage from "./pages/ArtistPage"
 import AuthPage from "./pages/AuthPage"
 import ProfilePage from "./pages/ProfilePage"
 import InfoPage from "./pages/InfoPage"
+import MenuPage from "./pages/MenuPage"
 import AboutPage from "./pages/AboutPage"
 import AdminSongsPage from "./pages/admin/AdminSongsPage"
 import AdminAlbumsPage from "./pages/admin/AdminAlbumsPage"
@@ -24,8 +23,7 @@ const App = () => {
   return (
     <>
        <Routes>
-        <Route path='/sso-callback' element={<AuthenticateWithRedirectCallback signInForceRedirectUrl="/auth-callback" />} />
-        <Route path='/auth-callback' element={<AuthCallbackPage />} />        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
           <Route path="songs" element={<AdminSongsPage />} />
           <Route path="albums" element={<AdminAlbumsPage />} />
@@ -39,6 +37,7 @@ const App = () => {
         <Route path="/info/about" element={<AboutPage />}/>
         <Route path="/info" element={<InfoPage />}/>
         <Route path="/info/:slug" element={<InfoPage />}/>
+        <Route path="/menu" element={<MenuPage />}/>
         
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/home" replace />}/>
@@ -48,7 +47,8 @@ const App = () => {
           <Route path="/liked" element={<CollectionPage type="liked" />}/>
           <Route path="/recently-played" element={<CollectionPage type="recent" />}/>
           <Route path="/artist/:artistId" element={<ArtistPage />}/>
-          <Route path="/playlist/:playlistId" element={<CollectionPage type="liked" />}/>          <Route path="/chat" element={<ChatPage />}/>
+          <Route path="/playlist/:playlistId" element={<CollectionPage type="liked" />}/>
+          <Route path="/chat" element={<ChatPage />}/>
           <Route path="/album/:albumId" element={<AlbumPage />}/>
           <Route path="/profile" element={<ProfilePage />}/>
         </Route>

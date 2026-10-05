@@ -1,42 +1,62 @@
-import { clerkClient, getAuth } from '@clerk/express'
+import jwt from "jsonwebtoken";
+import { User } from "../models/user.models.js";
 
-export const protectRoute = async (req, res, next) =>{
-    const { userId } = getAuth(req);
-    if(!userId){
-        console.warn("Protected request rejected", {
-            path: req.originalUrl,
-            hasBearerToken: /^Bearer\s+.+/i.test(req.headers.authorization || ""),
-            clerkUserId: userId || null,
-        });
-        return res.status(401).json({
-            message: "unauthorized - You",
-            reason: /^Bearer\s+.+/i.test(req.headers.authorization || "")
-                ? "Clerk could not validate the session token"
-                : "No session token was received by the API",
-        })
-    }
-    next();
-}
+const JWT_SECRET = process.env.JWT_SECRET || "beat_music_super_secure_jwt_secret_key_2026_spotify_clone";
 
-export const requireAdmin = async (req, res, next ) => {
+export const protectRoute = async (req, res, next) => {
     try {
-        const { userId } = getAuth(req);
-        if (!userId) {
-            return res.status(401).json({ message: "unauthorized - You" });
+        const token =
+            req.cookies?.token ||
+            req.headers.authorization?.replace(/^Bearer\s+/i, "");
+
+        if (!token) {
+            return res.status(401).json({
+                message: "Unauthorized - You must be logged in",
+                reason: "No authentication token was received",
+            });
         }
-        const currentUser = await clerkClient.users.getUser(userId);
-        const userEmail = currentUser.emailAddresses.find(e => e.id === currentUser.primaryEmailAddressId)?.emailAddress?.trim().toLowerCase();
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const userId = decoded.id || decoded.sub;
+
+        const user = await User.findById(userId).select("-password");
+        if (!user) {
+            return res.status(401).json({
+                message: "Unauthorized - Account no longer exists",
+            });
+        }
+
+        req.user = user;
+        req.auth = { userId: user._id.toString() };
+        next();
+    } catch (error) {
+        return res.status(401).json({
+            message: "Unauthorized - Invalid or expired session",
+            reason: error.message,
+        });
+    }
+};
+
+export const requireAdmin = async (req, res, next) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized - You must be logged in" });
+        }
+
         const configuredEmails = (process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || "")
             .split(",")
             .map((email) => email.trim().toLowerCase())
             .filter(Boolean);
-        const isAdmin = currentUser.publicMetadata?.role === "admin" || configuredEmails.includes(userEmail);
 
-        if(!isAdmin){
-            return res.status(403).json({message : "Unauthorized - you must be an admin"})
+        const userEmail = req.user.email?.trim().toLowerCase();
+        const isAdmin = req.user.role === "admin" || (userEmail && configuredEmails.includes(userEmail));
+
+        if (!isAdmin) {
+            return res.status(403).json({ message: "Unauthorized - you must be an admin" });
         }
+
         next();
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
